@@ -1,5 +1,18 @@
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/about/
 
+// A guide to setting up a .NET Core project using Docker, with integrated unit and component tests
+https://joehonour.medium.com/a-guide-to-setting-up-a-net-core-project-using-docker-with-integrated-unit-and-component-tests-a326ca5a0284
+
+// Dockerize an ASP.NET Core application
+https://docs.docker.com/samples/dotnetcore/
+
+// проблемы с msbuild
+https://stackoverflow.com/questions/64295288/could-not-run-the-generateresource-task-because-msbuild-could-not-create-or-co
+
+
+C:\Users\vitaliiz\AppData\Local\Docker\ 
+
+
 окружение:
 
 - сам docker;

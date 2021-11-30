@@ -16,7 +16,7 @@ namespace EditButtonAppTest
         public void Setup()
         {
             var options = new AppiumOptions();
-            options.AddAdditionalCapability("app", @"D:\Automation\SampleApps\EditButtonApp\EditButtonApp\bin\Debug\EditButtonApp.exe");
+            options.AddAdditionalCapability("app", @"D:\Automation\Automation\SampleApps\EditButtonApp\EditButtonApp\bin\Debug\EditButtonApp.exe");
             options.AddAdditionalCapability("deviceName", "WindowsPC");
             driver = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), options);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
