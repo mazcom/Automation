@@ -1,0 +1,9 @@
+https://docs.microsoft.com/en-us/virtualization/windowscontainers/about/
+
+окружение:
+
+- сам docker;
+- проект юнит-тестов;
+- сампловое приложение;
+- результат выполнения тестов;
+
