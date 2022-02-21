@@ -13,6 +13,32 @@ https://stackoverflow.com/questions/64295288/could-not-run-the-generateresource-
 C:\Users\vitaliiz\AppData\Local\Docker\ 
 
 
+https://stackoverflow.com/questions/64772680/unit-test-a-net-core-app-that-requires-docker
+
+https://github.com/dotnet/announcements/labels/.NET%20Framework
+
+https://github.com/microsoft/dotnet-framework-docker/blob/main/samples/dotnetapp/Dockerfile
+
+https://github.com/dotnet/announcements/labels/.NET%20Framework
+
+https://hub.docker.com/r/thesisswen/win-environment
+
+https://www.docker.com/blog/containerized-python-development-part-1/
+
+
+https://www.datacamp.com/community/tutorials/python-install-pip?utm_source=adwords_ppc&utm_medium=cpc&utm_campaignid=1455363063&utm_adgroupid=65083631748&utm_device=c&utm_keyword=&utm_matchtype=b&utm_network=g&utm_adpostion=&utm_creative=332602034361&utm_targetid=aud-392016246653:dsa-429603003980&utm_loc_interest_ms=&utm_loc_physical_ms=1012866&gclid=Cj0KCQiA15yNBhDTARIsAGnwe0WXHSgTPzQuN1xIAx_UJIXjKyRnAcbeiMpDg-daUD-lWw-rc4qt1_waAv9sEALw_wcB
+
+https://aboullaite.me/dockerfile-run-vs-cmd-vs-entrypoint/
+
+https://github.com/microsoft/WinAppDriver/issues/165
+
+https://www.pdq.com/blog/ui-testing-a-wpf-app-in-windows-containers/
+
+
+// Remove all dangling images.
+docker image prune -a
+
+
 окружение:
 
 - сам docker;

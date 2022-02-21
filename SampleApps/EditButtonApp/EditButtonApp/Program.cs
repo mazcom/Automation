@@ -14,9 +14,11 @@ namespace EditButtonApp
         [STAThread]
         static void Main()
         {
+            System.Diagnostics.Trace.WriteLine("Program Started...");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
+            System.Diagnostics.Trace.WriteLine("Program closed...");
         }
     }
 }

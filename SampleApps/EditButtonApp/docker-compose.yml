@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  windriver:
+    image: "windows-driver"    
+    tty: true # dont stop docker        
+    ports:
+      - 4723:4723
+
+  editbutton:
+    image: "edit-button"
+    tty: true # dont stop docker        
+    depends_on:
+      - windriver
+    environment:
+      - HUB_HOST=windriver
+      - HUB_PORT=4723
+    

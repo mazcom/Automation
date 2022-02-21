@@ -1,14 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/windows:1809
-#FROM mcr.microsoft.com/windows/server:ltsc2022
-#FROM mcr.microsoft.com/windows/server
-#FROM mcr.microsoft.com/windows/server:ltsc2022
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 FROM mcr.microsoft.com/dotnet/framework/sdk:4.8
-#FROM mcr.microsoft.com/dotnet/framework/runtime:4.8
-
-RUN powershell Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
-
 
 #FROM python:3.9
 
@@ -80,7 +73,6 @@ RUN dotnet build
 
 RUN reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
 
-
 #ENTRYPOINT ["WinAppDriver.exe"]
 
 #CMD ["Start-Process", "C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe"]
@@ -100,13 +92,8 @@ RUN reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppMod
 
 #CMD StartDriver.bat
 
-EXPOSE 4723
-
 #ENTRYPOINT ["StartDriver.bat"]
-CMD ["StartDriver.bat"]
-
-#CMD ["StartTests.bat" ]
-
+CMD ["StartDriver.bat" ]
 
 
 #RUN 'C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe'
