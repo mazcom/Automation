@@ -4,7 +4,8 @@ using DbNamesFixer;
 using DbNamesFixer.Model;
 using Newtonsoft.Json.Linq;
 
-Console.WriteLine(@"Please, provide a path to tests like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\");
+Console.ResetColor();
+Console.WriteLine(@"Please, enter a path to tests path like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\");
 
 // pathToTests = @"D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\";
 
@@ -22,7 +23,6 @@ string[] files = Directory.GetFiles(pathToTests,
 
 foreach (var testFile in files)
 {
-
   string currentTestFileName = testFile;
   string currentDir = Path.GetDirectoryName(currentTestFileName)!;
 
@@ -44,8 +44,8 @@ foreach (var testFile in files)
         continue;
       }
 
+      // Если нет раздела, где мы используем файлы с созданием баз данных, то ничего не делаем.
       var pre_runs = jsonObject.SelectToken("pre_run")!?.ToArray();
-
       if (pre_runs == null)
       {
         continue;
@@ -54,10 +54,10 @@ foreach (var testFile in files)
       TestModel test = new() { Id = (Guid)jsonObject.SelectToken("id")! };
 
       // СОЗДАНИЕ БАЗЫ ДАННЫХ.
-      var createDbCommandLine = (string)(jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!)
-       .FirstOrDefault(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!;
-      if (createDbCommandLine != null)
+      foreach (var token in jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
       {
+        var createDbCommandLine = (string)token!;
         // Получаем имя базы данных из теста like Databases.sql
         var createDbFileName = FilesHelper.ExtractFileName(createDbCommandLine)!;
         // Полный путь к файлу создания базы данных.
@@ -66,10 +66,10 @@ foreach (var testFile in files)
       }
 
       // УДАЛЕНИЕ БАЗЫ ДАННЫХ.
-      var cleanDbCommandLine = (string)jsonObject.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!
-      .FirstOrDefault(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!;
-      if (cleanDbCommandLine != null)
+      foreach (var token in jsonObject.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
       {
+        var cleanDbCommandLine = (string)token!;
         // Получаем имя базы данных из теста like CleanUp.sql
         var cleanUpDbFileName = FilesHelper.ExtractFileName(cleanDbCommandLine)!;
         // Полный путь к файлу создания базы данных.
@@ -79,108 +79,145 @@ foreach (var testFile in files)
 
       test.JsonObject = (JObject)jsonObject;
       tests.Add(test);
+
+      if (test.CleanDbFiles.Count == 0)
+      {
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"$ The test with id={test.Id} in the file ${testFile} does not have a clean.sql file!");
+        Console.ResetColor();
+      }
     }
   }
 
   //
   // Adjust database names.
   //
+
   // сопоставляем имя файла и индекс.
   Dictionary<string, int> origFileIndex = new();
 
   // Имя оригинального файла и его оригинальный контент
   Dictionary<string, string> origFileContent = new();
 
-
   foreach (var test in tests)
   {
-    string currentCreateDbShortFileName = test.CreateDbFiles[0].FileName!;
-    string currentCleanDbShortFileName = test.CleanDbFiles[0].FileName!;
 
-    string currentCreateDbFileName = test.CreateDbFiles[0].FullPath!;
-    string currentCleanDbFileName = test.CleanDbFiles[0].FullPath!;
+    List<string> newCreateDbFiles = new();
+    List<string> newCleanDbFiles = new();
 
-    if (!origFileIndex.ContainsKey(currentCreateDbFileName))
+    foreach (var createDbFileObj in test.CreateDbFiles)
     {
-      origFileIndex[currentCreateDbFileName] = 0;
-      origFileIndex[currentCleanDbFileName] = 0;
+      string currentCreateDbShortFileName = createDbFileObj.FileName!;
+      string currentCreateDbFileName = createDbFileObj.FullPath!;
 
-      // Получаем оригинальный контент из файла создания базы данных.
-      using StreamReader srCreateDb = new StreamReader(currentCreateDbFileName);
-      origFileContent[currentCreateDbFileName] = srCreateDb.ReadToEnd();
-
-      // Получаем оригинальный контент из файла создания базы данных.
-      using StreamReader srCleanDb = new StreamReader(currentCleanDbFileName);
-      origFileContent[currentCleanDbFileName] = srCleanDb.ReadToEnd();
-    }
-
-    // Create Db File
-    string newCreateDbFileName;
-    int dbCreateIndex = origFileIndex[currentCreateDbFileName];
-    if (dbCreateIndex == 0)
-    {
-      newCreateDbFileName = currentCreateDbFileName;
-      origFileIndex[currentCreateDbFileName] = 1;
-    }
-    else
-    {
-      newCreateDbFileName = FilesHelper.AddIndex(currentCreateDbFileName, dbCreateIndex);
-      origFileIndex[currentCreateDbFileName] = dbCreateIndex + 1;
-      // Создаеём новый новый файл и заполняем его иригинальным коннентом. 
-      using StreamWriter swCreateDb = new StreamWriter(newCreateDbFileName);
-      swCreateDb.Write(origFileContent[currentCreateDbFileName]);
-    }
-
-    // Clean Db File
-    string newCleanDbFileName;
-    int dbCleanIndex = origFileIndex[currentCleanDbFileName];
-    if (dbCleanIndex == 0)
-    {
-      newCleanDbFileName = currentCleanDbFileName;
-      origFileIndex[currentCleanDbFileName] = 1;
-    }
-    else
-    {
-      newCleanDbFileName = FilesHelper.AddIndex(currentCleanDbFileName, dbCleanIndex);
-      origFileIndex[currentCleanDbFileName] = dbCleanIndex + 1;
-      // Создаеём новый новый файл и заполняем его иригинальным коннентом. 
-      using StreamWriter swCleanDb = new StreamWriter(newCleanDbFileName);
-      swCleanDb.Write(origFileContent[currentCleanDbFileName]);
-    }
-
-    // Меняем имена в файлах создания баз данных.
-    if (DBNamesReplacer.GenerateAndReplace(newCreateDbFileName, out List<Tuple<string, string>> oldNewNames))
-    {
-      // Меняем имена в файлах очистки баз данных.
-      foreach (var oldNewValue in oldNewNames)
+      if (!origFileIndex.ContainsKey(currentCreateDbFileName))
       {
-        DBNamesReplacer.Replace(newCleanDbFileName, oldNewValue.Item1, oldNewValue.Item2);
+        origFileIndex[currentCreateDbFileName] = 0;
+
+        // Получаем оригинальный контент из файла создания базы данных.
+        using StreamReader srCreateDb = new StreamReader(currentCreateDbFileName);
+        origFileContent[currentCreateDbFileName] = srCreateDb.ReadToEnd();
+      }
+
+      // Create Db File
+      string newCreateDbFileName;
+      int dbCreateIndex = origFileIndex[currentCreateDbFileName];
+      if (dbCreateIndex == 0)
+      {
+        newCreateDbFileName = currentCreateDbFileName;
+        origFileIndex[currentCreateDbFileName] = 1;
+      }
+      else
+      {
+        newCreateDbFileName = FilesHelper.AddIndex(currentCreateDbFileName, dbCreateIndex);
+        origFileIndex[currentCreateDbFileName] = dbCreateIndex + 1;
+        // Создаеём новый новый файл и заполняем его иригинальным коннентом. 
+        using StreamWriter swCreateDb = new StreamWriter(newCreateDbFileName);
+        swCreateDb.Write(origFileContent[currentCreateDbFileName]);
+      }
+
+      // Меняем имена файлов в json-тест-объекте.
+      // Create DB
+      var jsonObj = (JValue)test.JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!
+        .FirstOrDefault(t => ((string)t!).Contains($"{currentCreateDbShortFileName}", StringComparison.OrdinalIgnoreCase))!;
+      if (jsonObj != null)
+      {
+        var dbComandLine = jsonObj.Value as string;
+        jsonObj.Value = dbComandLine!.Replace(currentCreateDbShortFileName, Path.GetFileName(newCreateDbFileName));
+      }
+
+      newCreateDbFiles.Add(newCreateDbFileName);
+    }
+
+    foreach (var cleanDbFileObj in test.CleanDbFiles)
+    {
+      string currentCleanDbShortFileName = cleanDbFileObj.FileName!;
+      string currentCleanDbFileName = cleanDbFileObj.FullPath!;
+
+      if (!origFileIndex.ContainsKey(currentCleanDbFileName))
+      {
+        origFileIndex[currentCleanDbFileName] = 0;
+
+        // Получаем оригинальный контент из файла создания базы данных.
+        using StreamReader srCreateDb = new StreamReader(currentCleanDbFileName);
+        origFileContent[currentCleanDbFileName] = srCreateDb.ReadToEnd();
+      }
+
+      // clean Db File
+      string newCleanDbFileName;
+      int dbCleanIndex = origFileIndex[currentCleanDbFileName];
+      if (dbCleanIndex == 0)
+      {
+        newCleanDbFileName = currentCleanDbFileName;
+        origFileIndex[currentCleanDbFileName] = 1;
+      }
+      else
+      {
+        newCleanDbFileName = FilesHelper.AddIndex(currentCleanDbFileName, dbCleanIndex);
+        origFileIndex[currentCleanDbFileName] = dbCleanIndex + 1;
+        // Создаеём новый новый файл и заполняем его иригинальным коннентом. 
+        using StreamWriter swCreateDb = new StreamWriter(newCleanDbFileName);
+        swCreateDb.Write(origFileContent[currentCleanDbFileName]);
+      }
+
+      // Меняем имена файлов в json-тест-объекте.
+      // Create DB
+      var jsonObj = (JValue)test.JsonObject!.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!
+        .FirstOrDefault(t => ((string)t!).Contains($"{currentCleanDbShortFileName}", StringComparison.OrdinalIgnoreCase))!;
+      if (jsonObj != null)
+      {
+        var dbComandLine = jsonObj.Value as string;
+        jsonObj.Value = dbComandLine!.Replace(currentCleanDbShortFileName, Path.GetFileName(newCleanDbFileName));
+      }
+
+      newCleanDbFiles.Add(newCleanDbFileName);
+    }
+
+    // меняем имена баз данных в файлах.
+    foreach (var newCreateDbFile in newCreateDbFiles)
+    {
+      // Меняем имена баз данных в файлах создания баз данных.  
+      if (DBNamesReplacer.GenerateAndReplace(newCreateDbFile, out List<Tuple<string, string>> oldNewNames))
+      {
+
+        newCleanDbFiles.ForEach(cf =>
+        {
+          // Меняем имена в файлах очистки баз данных.
+          foreach (var oldNewValue in oldNewNames)
+          {
+            DBNamesReplacer.Replace(cf, oldNewValue.Item1, oldNewValue.Item2);
+          }
+        });
       }
     }
-
-    // Меняем имена файлов в json-тест-объекте.
-    // Create DB
-    var jsonObj = (JValue)test.JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!
-      .FirstOrDefault(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!;
-    if (jsonObj != null)
-    {
-      var dbComandLine = jsonObj.Value as string;
-      jsonObj.Value = dbComandLine!.Replace(currentCreateDbShortFileName, Path.GetFileName(newCreateDbFileName));
-    }
-
-    // Clean DB
-    jsonObj = (JValue)test.JsonObject!.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!
-      .FirstOrDefault(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!;
-    if (jsonObj != null)
-    {
-      var dbComandLine = jsonObj.Value as string;
-      jsonObj.Value = dbComandLine!.Replace(currentCleanDbShortFileName, Path.GetFileName(newCleanDbFileName));
-    }
   }
-
-  // Записываем тесты.
+  // Переписываем файл _definition.tests с тестами с уже исправленными именами файлов.
   File.WriteAllText(currentTestFileName, jsonObjects.ToString());
 }
 
-
-Console.WriteLine("Completed!");
+Console.WriteLine();
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine($"Completed!");
+Console.WriteLine($"Total _definition.tests files count = {files.Length}");
+Console.ResetColor();

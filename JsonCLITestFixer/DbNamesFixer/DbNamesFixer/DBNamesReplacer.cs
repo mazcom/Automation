@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace DbNamesFixer
 {
@@ -17,29 +12,33 @@ namespace DbNamesFixer
       // Читаем контент из файла и запоминаем.
       fileLines = File.ReadAllLines(fullFileName);
 
-      string oldDbName = null;
-      string newDbName = null;
+      string? oldDbName = null;
+      string? newDbName = null;
       for (int i = 0; i < fileLines.Length; i++)
       {
         var line = fileLines[i];
 
-        string pattern = @"(?<=SET\s+@db_name\s+=\s+N'+)\w+";
-        var match = Regex.Match(line, pattern);
+        string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[master\].dbo.sp_create_db\s+N'+)\w+" };
 
-        if (match.Success)
+        foreach (var pattern in patterns)
         {
-          Guid guid = Guid.NewGuid();
-          oldDbName = match.Value;
-          newDbName = $"{match}_{guid.ToString().Replace("-", "_")}";
-          oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
+          var match = Regex.Match(line, pattern);
 
-          string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
-          fileLines[i] = newLine;
-        }
-        else if (oldDbName != null)
-        {
-          string newLine = line.Replace(oldDbName, newDbName);
-          fileLines[i] = newLine;
+          if (match.Success)
+          {
+            Guid guid = Guid.NewGuid();
+            oldDbName = match.Value;
+            newDbName = $"{match}_{guid.ToString().Replace("-", "_")}";
+            oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
+
+            string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
+            fileLines[i] = newLine;
+          }
+          else if (oldDbName != null)
+          {
+            string newLine = line.Replace(oldDbName, newDbName);
+            fileLines[i] = newLine;
+          }
         }
       }
 
