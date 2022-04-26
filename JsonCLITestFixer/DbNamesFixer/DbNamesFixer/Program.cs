@@ -5,7 +5,7 @@ using DbNamesFixer.Model;
 using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to tests path like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\");
+Console.WriteLine(@"Please, enter a path to tests like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\");
 
 // pathToTests = @"D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\";
 
