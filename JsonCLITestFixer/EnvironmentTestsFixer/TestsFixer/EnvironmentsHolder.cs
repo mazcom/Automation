@@ -21,7 +21,7 @@ namespace TestsFixer
             "*.environments",
             SearchOption.AllDirectories);
 
-      HashSet<Guid> environmentsUsedInTests = new HashSet<Guid>(tests.Select(t => t.Environment));
+      HashSet<Guid> environmentsUsedInTests = new HashSet<Guid>(tests.Select(t => t.EnvironmentId));
 
       foreach (var fileName in environmentFiles)
       {
@@ -39,7 +39,18 @@ namespace TestsFixer
             if (environmentsUsedInTests.Contains(environmentId) && !processedIds.Contains(environmentId))
             {
               processedIds.Add(environmentId);
-              Environments.Add(new(jsonObject));
+              TestsEnvironment environment = new(jsonObject);
+
+              // Заполняем тестами текущий environment тестами, которые на него смотрят.
+              foreach (var test in tests)
+              {
+                if (environment.Id == test.EnvironmentId)
+                {
+                  environment.Tests.Add(test);
+                }
+              }
+
+              Environments.Add(environment);
             }
           }
           rawJsonArrayTests.Add(new Tuple<string, JArray>(fileName, jsonObjects));

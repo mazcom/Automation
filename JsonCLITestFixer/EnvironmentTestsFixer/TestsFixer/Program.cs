@@ -23,7 +23,7 @@ if (!PathTraversal.TraverseTreeUp(pathToTests, environmentsPath, out var foundEn
 }
 
 TestsHolder testsHolder = new(pathToTests);
-EnvironmentsHolder environmentsHolder = new(testsHolder.Tests, environmentsPath: foundEnvironmentsPath);
+EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPath: foundEnvironmentsPath);
 
 
 

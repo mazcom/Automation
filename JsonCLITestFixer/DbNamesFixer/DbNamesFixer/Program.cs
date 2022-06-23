@@ -5,9 +5,9 @@ using DbNamesFixer.Model;
 using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to tests like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\");
+Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\");
 
-// pathToTests = @"D:\Projects\commandlinetests2\Tests\SqlServer\Studio\Documenter\";
+// pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\";
 
 string pathToTests = Console.ReadLine()!;
 if (!Directory.Exists(pathToTests))

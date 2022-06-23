@@ -14,12 +14,12 @@ namespace TestsFixer.Model
     public Test(JObject jsonObject)
     {
       this.jsonObject = jsonObject;
-      Environment = Guid.Parse(jsonObject["environment"]!.Value<string>()!);
+      EnvironmentId = Guid.Parse(jsonObject["environment"]!.Value<string>()!);
       Name = jsonObject["name"]!.Value<string>()!;
       Description = jsonObject["description"]!.Value<string>()!;
     }
 
-    public Guid Environment { get; }
+    public Guid EnvironmentId { get; }
     public string Name { get; }
     public string Description { get; set; }
   }

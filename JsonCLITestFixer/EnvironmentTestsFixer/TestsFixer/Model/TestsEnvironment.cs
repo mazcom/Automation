@@ -15,5 +15,7 @@ namespace TestsFixer.Model
 
     public Guid Id { get; }
     public string Name { get; }
+
+    public List<Test> Tests { get; } = new();
   }
 }
