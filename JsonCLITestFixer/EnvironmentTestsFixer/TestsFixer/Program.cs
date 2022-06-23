@@ -17,22 +17,39 @@ if (!Directory.Exists(pathToTests))
 }
 
 const string environmentsPath = "Environments";
-if (!PathTraversal.TraverseTreeUp(pathToTests, environmentsPath, out var foundEnvironmentsPath))
+if (!PathTraversal.TraverseTreeUp(pathToTests, environmentsPath, out var foundEnvironmentsFullPath))
 {
   throw new DirectoryNotFoundException($"The {environmentsPath} path is not found!");
 }
 
+// Create structure of the objects: environments, tests and bind them.
 TestsHolder testsHolder = new(pathToTests);
-EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPath: foundEnvironmentsPath);
+EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPath: foundEnvironmentsFullPath);
+
+// 
+foreach (var environment in environmentsHolder.Environments)
+{
+  environment.FetchInformation();
+}
+
+//  
+
+
+
+//environmentsHolder.Environments
 
 
 
 Console.ReadKey();
 
 /*
+  Построение объектов. 
+  Environments, tests и связь между ними. 
+
+
   Прослеживается несколько этапов:
   Сбор информации(имена баз данных, есть ли clean_up?)
-  Построение объектов. 
+  
   
 
  
@@ -59,7 +76,7 @@ Console.ReadKey();
    
 
   Подумать процессорный движок так,
-  что на определённом этапе вызываются процессоры, которые процессят jsnon(добавляют, изменяют инфу) 
+  что на определённом этапе вызываются процессоры, которые процессят json(добавляют, изменяют инфу) 
  
   Объект содержит массив JArray объектов. 
   также содержит массив сконвертированных из них POCO объектов, которые реально содержат ссылки на JObjectы

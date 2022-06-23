@@ -9,7 +9,9 @@ namespace TestsFixer
 {
   internal class EnvironmentsHolder
   {
+
     // Пары имён файлов тестов и объектов: c:\Projects\Environments\*.environments и JArray.
+    // возможно уже не нужно так как передаём полный путь в сам энвайронмент.
     private List<Tuple<string, JArray>> rawJsonArrayTests = new();
 
     /// <summary>
@@ -39,7 +41,7 @@ namespace TestsFixer
             if (environmentsUsedInTests.Contains(environmentId) && !processedIds.Contains(environmentId))
             {
               processedIds.Add(environmentId);
-              TestsEnvironment environment = new(jsonObject);
+              TestsEnvironment environment = new(jsonObject, fileName);
 
               // Заполняем тестами текущий environment тестами, которые на него смотрят.
               foreach (var test in tests)
