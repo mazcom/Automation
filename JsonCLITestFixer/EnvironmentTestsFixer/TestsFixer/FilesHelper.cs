@@ -9,7 +9,7 @@ namespace TestsFixer
 {
   internal class FilesHelper
   {
-    private static readonly Regex rx = new(@"[A-Za-z0-9_-]+\.sql", RegexOptions.IgnoreCase);
+    private static readonly Regex rx = new(@"[A-Za-z0-9_\s-]+\.sql", RegexOptions.IgnoreCase);
 
     public static string? ExtractSqlFileName(string fromCommandLine)
     {

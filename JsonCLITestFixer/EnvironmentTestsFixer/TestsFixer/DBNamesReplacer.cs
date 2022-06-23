@@ -17,14 +17,13 @@ namespace TestsFixer
       // Читаем контент из файла и запоминаем.
       fileLines = File.ReadAllLines(fullFileName);
 
-      string? oldDbName = null;
-      string? newDbName = null;
+      // Find old db names, generate new names and replace where it occurs first time. 
+      //string? oldDbName = null;
+      //string? newDbName = null;
       for (int i = 0; i < fileLines.Length; i++)
       {
         var line = fileLines[i];
-
         string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[master\].dbo.sp_create_db\s+N'+)\w+" };
-
         foreach (var pattern in patterns)
         {
           var match = Regex.Match(line, pattern);
@@ -32,20 +31,36 @@ namespace TestsFixer
           if (match.Success)
           {
             Guid guid = Guid.NewGuid();
-            oldDbName = match.Value;
-            newDbName = $"{match}_{guid.ToString().Replace("-", "_")}";
+            string oldDbName = match.Value;
+            string newDbName = $"{match}_{guid.ToString().Replace("-", "_")}";
             oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
 
             string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
             fileLines[i] = newLine;
           }
-          else if (oldDbName != null)
+        }
+      }
+
+      // Replace names in other places
+      if (oldNewNames.Count > 0)
+      {
+        for (int i = 0; i < fileLines.Length; i++)
+        {
+          var line = fileLines[i];
+          string[] patterns = { @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+", @"(?<=^USE\s+)\w+" };
+          foreach (var pattern in patterns)
           {
-            string newLine = line.Replace(oldDbName, newDbName);
-            fileLines[i] = newLine;
+            var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
+
+            if (match.Success)
+            {
+              string newDbName = oldNewNames.Where(e => e.Item1.Equals(match.Value, StringComparison.OrdinalIgnoreCase)).First().Item2;
+              fileLines[i] = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
+            }
           }
         }
       }
+
 
       if (oldNewNames.Count > 0)
       {
