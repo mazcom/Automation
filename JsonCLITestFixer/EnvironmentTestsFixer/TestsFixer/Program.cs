@@ -49,14 +49,14 @@ foreach (var environment in environmentsHolder.Environments)
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.WriteLine($"The environment {environment.Id}-{environment.Name} was not patched. The reason: {environment.PatchError}");
     Console.ResetColor();
-    // the following tests were not patched because environment was not patached.
-    //environment.Tests.
   }
   
 }
 
 environmentsHolder.SaveChanges();
 testsHolder.SaveChanges();
+
+Console.WriteLine($"The patching has been completed!");
 
 Console.ReadKey();
 

@@ -31,13 +31,17 @@ namespace TestsFixer.Model
     private bool PatchDatabaseInfo()
     {
       // СОЗДАНИЕ БАЗЫ ДАННЫХ.
-      foreach (var token in jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
+      var createDbCommandLineNode = jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!.FirstOrDefault();
+
+      //foreach (var token in jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
+      //  Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
+      if (createDbCommandLineNode != null) 
       {
-        var createDbCommandLine = (string)token!;
+        var createDbCommandLine = (string)createDbCommandLineNode!;
 
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
-        var sqlFileName = FilesHelper.ExtractSqlFileName(createDbCommandLine)!;
+        var sqlFileName = RegexHelper.ExtractSqlFileName(createDbCommandLine)!;
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
 
         // Меняем имена баз данных в файлах создания баз данных.  
@@ -53,6 +57,11 @@ namespace TestsFixer.Model
           Console.WriteLine($"The file {createdatabaseFileFullPath} has been patched!");
           Console.ResetColor();
 
+          string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
+          if (currentServerName != null)
+          {
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, "%sqllast%");
+          }
         }
         else
         {
@@ -79,7 +88,7 @@ namespace TestsFixer.Model
 
       string cleanUpFileName = createFileName.Insert(createFileName.IndexOf(".sql"), "_CleanUp");
       string cleanUpSection =
-$@"{{
+$@"[{{
 ""when"":""Always"",
 ""actions"": [
              {{
@@ -96,7 +105,7 @@ $@"{{
              }}     
   ]  
     
-}}";
+}}]";
       this.jsonObject.Add("clean_up", JProperty.Parse(cleanUpSection));
 
       Console.ForegroundColor = ConsoleColor.Green;
