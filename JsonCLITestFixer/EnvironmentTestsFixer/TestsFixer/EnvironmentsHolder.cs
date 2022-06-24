@@ -9,14 +9,9 @@ namespace TestsFixer
 {
   internal class EnvironmentsHolder
   {
-
     // Пары имён файлов тестов и объектов: c:\Projects\Environments\*.environments и JArray.
-    // возможно уже не нужно так как передаём полный путь в сам энвайронмент.
     private List<Tuple<string, JArray>> rawJsonEnvironmentsArray = new();
 
-    /// <summary>
-    /// </summary>
-    /// <param name="testFiles">Set of the _definition.tests files</param>
     public EnvironmentsHolder(IEnumerable<Test> tests, string environmentsPath)
     {
       string[] environmentFiles = Directory.GetFiles(environmentsPath,
@@ -61,6 +56,8 @@ namespace TestsFixer
       }
     }
 
+    public List<TestsEnvironment> Environments { get; } = new();
+
     public void SaveChanges()
     {
       foreach (var environmen in rawJsonEnvironmentsArray)
@@ -68,8 +65,5 @@ namespace TestsFixer
         File.WriteAllText(environmen.Item1, environmen.Item2.ToString());
       }
     }
-
-
-    public List<TestsEnvironment> Environments { get; } = new();
   }
 }

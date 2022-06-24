@@ -9,7 +9,7 @@ namespace TestsFixer
 {
   internal static class DBReplacer
   {
-    private static string[] patternsToSearchCreateDbNames = { 
+    private static string[] patternsToSearchCreateDbNames = {
       @"(?<=SET\s+@db_name\s+=\s+N'+)\w+"
       , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
 
@@ -104,15 +104,6 @@ namespace TestsFixer
           fileLines[i] = Regex.Replace(line, pattern, "123pwd!", RegexOptions.IgnoreCase);
           replaced = true;
         }
-
-        //string[] patterns = patternsToSearchCreateDbNames.Concat(patternsToSearchUseDbNames).ToArray();
-        //foreach (var pattern in patterns)
-        //{
-        //  var match = Regex.Match(line, pattern);
-        //  if (match.Success)
-        //  {
-        //  }
-        //}
       }
 
       if (replaced)
@@ -145,7 +136,7 @@ namespace TestsFixer
                 replaced = true;
                 break;
               }
-            }            
+            }
           }
         }
       }
@@ -156,7 +147,6 @@ namespace TestsFixer
       }
     }
 
-
     public static string TryToReplaceServerNameInConnectionString(string line)
     {
       string pattern = @"(?<=Data Source=)[A-Za-z0-9_\:\(\)\*-s{0,}\\]+\s{0,};";
@@ -166,7 +156,7 @@ namespace TestsFixer
         line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty) + ";");
       }
 
-      return line ;
+      return line;
     }
 
     /// <summary>
@@ -182,7 +172,7 @@ namespace TestsFixer
         {
           if (line.Contains(pair.Item1))
           {
-            line = line.Replace(pair.Item1, pair.Item2); 
+            line = line.Replace(pair.Item1, pair.Item2);
             break;
           }
         }

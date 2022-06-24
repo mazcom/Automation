@@ -10,13 +10,9 @@ namespace TestsFixer
 {
   internal class TestsHolder
   {
-
     // Пары имён файлов тестов и объектов: c:\Projects\Tests\_definition.tests и JArray.
     private List<Tuple<string, JArray>> rawJsonTestsArray = new();
 
-    /// <summary>
-    /// </summary>
-    /// <param name="testFiles">Set of the _definition.tests files</param>
     public TestsHolder(string pathToTests)
     {
       string[] testFiles = Directory.GetFiles(pathToTests,
