@@ -10,7 +10,7 @@ namespace TestsFixer
   internal class RegexHelper
   {
     private static readonly Regex rxSqlFileName = new(@"[A-Za-z0-9_\s-]+\.sql", RegexOptions.IgnoreCase);
-    private static readonly Regex rxServerName = new(@"(?<=\/connection:)%[A-Za-z0-9_\:\(\)\*]+%", RegexOptions.IgnoreCase);
+    private static readonly Regex rxServerName = new(@"(?<=\/connection:)%[A-Za-z0-9_\:\(\)\*-]+%", RegexOptions.IgnoreCase);
     //private static readonly Regex rx = new(@"[A-Za-z0-9_\s-]+\.sql", RegexOptions.IgnoreCase);
 
     public static string? ExtractSqlFileName(string fromCommandLine)

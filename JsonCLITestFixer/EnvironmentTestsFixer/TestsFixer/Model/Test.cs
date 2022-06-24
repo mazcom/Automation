@@ -39,8 +39,11 @@ namespace TestsFixer.Model
 
     public void PatchDatabaseNames()
     {
-      foreach (JValue token in this.jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains("/database:", StringComparison.OrdinalIgnoreCase))!)
+      var createDbNodes = this.jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains("/database:", StringComparison.OrdinalIgnoreCase))!;
+
+
+      foreach (JValue token in createDbNodes)
       {
         var createDbCommandLine = (string)token!;
 
@@ -55,13 +58,24 @@ namespace TestsFixer.Model
           }
 
           createDbCommandLine = createDbCommandLine.Replace(oldDatabase, newDatabase);
+
+          string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
+          if (currentServerName != null)
+          {
+            createDbCommandLine = createDbCommandLine.Replace(currentServerName, "%sqllast%");
+          }
+
           token.Value = createDbCommandLine;
           break;
         }
+
       }
-      Console.ForegroundColor = ConsoleColor.Green;
-      Console.WriteLine($"The databases in the test {Id}-{Name} have been patched!");
-      Console.ResetColor();
+      if (createDbNodes.Count() > 0)
+      {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The databases in the test {Id}-{Name} have been patched!");
+        Console.ResetColor();
+      }
     }
     public void PatchEnterprise()
     {

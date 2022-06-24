@@ -62,6 +62,10 @@ namespace TestsFixer.Model
           {
             ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, "%sqllast%");
           }
+          else
+          {
+
+          }
         }
         else
         {
@@ -95,7 +99,7 @@ $@"[{{
                 ""run"" : {{
                             ""code"" : {{
                                          ""type"" : ""cmd"",
-                                         ""code"" : ""%dbforgesql% /execute /connection:%sqlserver2019% /inputfile:\""{cleanUpFileName}\""""
+                                         ""code"" : ""%dbforgesql% /execute /connection:%sqllast% /inputfile:\""{cleanUpFileName}\""""
                             }}  
                 }},
                 ""exit_codes"":[
