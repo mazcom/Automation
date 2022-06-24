@@ -34,13 +34,15 @@ Console.WriteLine($"Found total environments count {environmentsHolder.Environme
 // Patch environments and tests.
 foreach (var environment in environmentsHolder.Environments)
 {
-  Console.WriteLine($"Start patching the environment {environment.Id}-{environment.Name}"); 
+  Console.WriteLine($"Start patching the environment {environment.Id}-{environment.Name}..."); 
   if (environment.Patch())
   {
-    environment.Tests.ForEach(t => t.Patch());
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"The environment {environment.Id}-{environment.Name} has been patched successfully!");
-    Console.ResetColor();
+    Console.WriteLine($"The environment {environment.Id}-{environment.Name} has been successfully patched!");
+    environment.Tests.ForEach(t =>
+    {
+      Console.WriteLine($"Start patching the test {environment.Id}-{environment.Name}...");
+      t.Patch();
+    });
   }
   else
   {

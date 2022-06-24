@@ -34,7 +34,7 @@ namespace TestsFixer
           }
         }
 
-        string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[master\].dbo.sp_create_db\s+N'+)\w+" };
+        string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
         foreach (var pattern in patterns)
         {
           var match = Regex.Match(line, pattern);
@@ -63,7 +63,7 @@ namespace TestsFixer
           {
             var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
 
-            if (match.Success)
+            if (match.Success && !line.Contains("master"))
             {
               string newDbName = oldNewNames.Where(e => e.Item1.Equals(match.Value, StringComparison.OrdinalIgnoreCase)).First().Item2;
               fileLines[i] = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);

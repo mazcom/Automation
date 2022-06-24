@@ -49,7 +49,9 @@ namespace TestsFixer.Model
             NewDatabaseNames.Add(cf.Item2);
           });
 
-          
+          Console.ForegroundColor = ConsoleColor.Green;
+          Console.WriteLine($"The file {createdatabaseFileFullPath} has been patched!");
+          Console.ResetColor();
 
         }
         else
@@ -96,6 +98,11 @@ $@"{{
     
 }}";
       this.jsonObject.Add("clean_up", JProperty.Parse(cleanUpSection));
+
+      Console.ForegroundColor = ConsoleColor.Green;
+      Console.WriteLine($"The clean_up section has been added to an environment!");
+      Console.ResetColor();
+
       CreateCleanUpFile(cleanUpFileName);
     }
 
@@ -135,6 +142,9 @@ GO
         {
           sw.Write(sb.ToString());
         }
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The clean_up file {cleanUpFileFullPath} has been created!");
+        Console.ResetColor();
       }
     }
   }

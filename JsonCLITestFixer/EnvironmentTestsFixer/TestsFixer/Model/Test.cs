@@ -59,6 +59,9 @@ namespace TestsFixer.Model
           break;
         }
       }
+      Console.ForegroundColor = ConsoleColor.Green;
+      Console.WriteLine($"The databases in the test {Id}-{Name} have been patched!");
+      Console.ResetColor();
     }
     public void PatchEnterprise()
     {
@@ -79,6 +82,10 @@ $@"{{
 }}";
           ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
         }
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
+        Console.ResetColor();
       }
     }
   }
