@@ -23,22 +23,38 @@ if (!PathTraversal.TraverseTreeUp(pathToTests, environmentsPath, out var foundEn
 }
 
 // Create structure of the objects: environments, tests and bind them.
+Console.WriteLine("Collecting the tests...");
 TestsHolder testsHolder = new(pathToTests);
+Console.WriteLine("Collecting the environments...");
 EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPath: foundEnvironmentsFullPath);
 
-// 
+Console.WriteLine($"Found total tests count {testsHolder.AllTests.Count}");
+Console.WriteLine($"Found total environments count {environmentsHolder.Environments.Count}");
+
+// Patch environments and tests.
 foreach (var environment in environmentsHolder.Environments)
 {
-  environment.Patch();
+  Console.WriteLine($"Start patching the environment {environment.Id}-{environment.Name}"); 
+  if (environment.Patch())
+  {
+    environment.Tests.ForEach(t => t.Patch());
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"The environment {environment.Id}-{environment.Name} has been patched successfully!");
+    Console.ResetColor();
+  }
+  else
+  {
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine($"The environment {environment.Id}-{environment.Name} was not patched. The reason: {environment.PatchError}");
+    Console.ResetColor();
+    // the following tests were not patched because environment was not patached.
+    //environment.Tests.
+  }
+  
 }
 
-//  
-
-
-
-//environmentsHolder.Environments
-
-
+environmentsHolder.SaveChanges();
+testsHolder.SaveChanges();
 
 Console.ReadKey();
 

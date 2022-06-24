@@ -9,8 +9,9 @@ namespace TestsFixer
 {
   internal static class DBNamesReplacer
   {
-    public static bool GenerateNamesAndReplaceInFile(string fullFileName, out List<Tuple<string, string>> oldNewNames)
+    public static bool GenerateNamesAndReplaceInFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched)
     {
+      alreadyPatched = false;
       oldNewNames = new List<Tuple<string, string>>();
       string[]? fileLines;
 
@@ -21,6 +22,18 @@ namespace TestsFixer
       for (int i = 0; i < fileLines.Length; i++)
       {
         var line = fileLines[i];
+
+        // Проверяем, что уже фалик был пропатчен.
+        if (oldNewNames.Count == 0)
+        {
+          var alreadyPatchedMatch = Regex.Match(line, @"[0-9a-fA-F]{8}_[0-9a-fA-F]{4}_[0-9a-fA-F]{4}_[0-9a-fA-F]{4}_[0-9a-fA-F]{12}");
+          if (alreadyPatchedMatch.Success)
+          {
+            alreadyPatched = true;
+            return false;
+          }
+        }
+
         string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[master\].dbo.sp_create_db\s+N'+)\w+" };
         foreach (var pattern in patterns)
         {

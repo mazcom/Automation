@@ -12,7 +12,7 @@ namespace TestsFixer
 
     // Пары имён файлов тестов и объектов: c:\Projects\Environments\*.environments и JArray.
     // возможно уже не нужно так как передаём полный путь в сам энвайронмент.
-    private List<Tuple<string, JArray>> rawJsonArrayTests = new();
+    private List<Tuple<string, JArray>> rawJsonEnvironmentsArray = new();
 
     /// <summary>
     /// </summary>
@@ -48,6 +48,7 @@ namespace TestsFixer
               {
                 if (environment.Id == test.EnvironmentId)
                 {
+                  test.SetEnvironment(environment);
                   environment.Tests.Add(test);
                 }
               }
@@ -55,10 +56,19 @@ namespace TestsFixer
               Environments.Add(environment);
             }
           }
-          rawJsonArrayTests.Add(new Tuple<string, JArray>(fileName, jsonObjects));
+          rawJsonEnvironmentsArray.Add(new Tuple<string, JArray>(fileName, jsonObjects));
         }
       }
     }
+
+    public void SaveChanges()
+    {
+      foreach (var environmen in rawJsonEnvironmentsArray)
+      {
+        File.WriteAllText(environmen.Item1, environmen.Item2.ToString());
+      }
+    }
+
 
     public List<TestsEnvironment> Environments { get; } = new();
   }

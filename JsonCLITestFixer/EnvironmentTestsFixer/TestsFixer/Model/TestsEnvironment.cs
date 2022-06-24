@@ -24,12 +24,11 @@ namespace TestsFixer.Model
     public List<string> NewDatabaseNames { get; } = new();
     public List<string> OldDatabaseNames { get; } = new();
 
-    public void Patch()
-    {
-      PatchDatabaseInfo();
-    }
+    public bool Patch() => PatchDatabaseInfo();
 
-    private void PatchDatabaseInfo()
+    public string PatchError { get; private set; }
+
+    private bool PatchDatabaseInfo()
     {
       // СОЗДАНИЕ БАЗЫ ДАННЫХ.
       foreach (var token in jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
@@ -42,28 +41,39 @@ namespace TestsFixer.Model
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
 
         // Меняем имена баз данных в файлах создания баз данных.  
-        if (DBNamesReplacer.GenerateNamesAndReplaceInFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames))
+        if (DBNamesReplacer.GenerateNamesAndReplaceInFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
         {
           oldNewNames.ForEach(cf =>
           {
             OldDatabaseNames.Add(cf.Item1);
             NewDatabaseNames.Add(cf.Item2);
           });
+
+          
+
+        }
+        else
+        {
+          if (alreadyPatched)
+          {
+            PatchError = "The environment seems to be already patched.";
+            return false;
+          }
         }
 
         PatchCleanSection(sqlFileName);
-        // Получаем имя базы данных из теста like Databases.sql
-        //var createDbFileName = FilesHelper.ExtractFileName(createDbCommandLine)!;
-        // Полный путь к файлу создания базы данных.
-        //string initDbFullFileName = Path.Combine(currentDir, createDbFileName);
-        //test.CreateDbFiles.Add(new FileModel() { FullPath = initDbFullFileName, FileName = createDbFileName });
       }
+      return true;
     }
 
     private void PatchCleanSection(string createFileName)
     {
-      // todo: check the clean_up property exists
-
+      // check whether the clean_up property already exists
+      var cleanUpNode = this.jsonObject.SelectTokens("clean_up", errorWhenNoMatch: false)!.FirstOrDefault();
+      if (cleanUpNode != null)
+      {
+        return;
+      } 
 
       string cleanUpFileName = createFileName.Insert(createFileName.IndexOf(".sql"), "_CleanUp");
       string cleanUpSection =
@@ -86,8 +96,6 @@ $@"{{
     
 }}";
       this.jsonObject.Add("clean_up", JProperty.Parse(cleanUpSection));
-      Console.WriteLine(this.jsonObject.ToString());
-
       CreateCleanUpFile(cleanUpFileName);
     }
 

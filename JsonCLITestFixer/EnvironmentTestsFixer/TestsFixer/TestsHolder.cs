@@ -12,7 +12,7 @@ namespace TestsFixer
   {
 
     // Пары имён файлов тестов и объектов: c:\Projects\Tests\_definition.tests и JArray.
-    private List<Tuple<string, JArray>> rawJsonArrayTests = new();
+    private List<Tuple<string, JArray>> rawJsonTestsArray = new();
 
     /// <summary>
     /// </summary>
@@ -44,11 +44,19 @@ namespace TestsFixer
 
         if (foundTestsInFileCount > 0)
         {
-          rawJsonArrayTests.Add(new Tuple<string, JArray>(file, jsonObjects));
+          rawJsonTestsArray.Add(new Tuple<string, JArray>(file, jsonObjects));
         }
       }
     }
 
     public List<Test> AllTests { get; } = new();
+
+    public void SaveChanges()
+    {
+      foreach (var environmen in rawJsonTestsArray)
+      {
+        File.WriteAllText(environmen.Item1, environmen.Item2.ToString());
+      }
+    }
   }
 }
