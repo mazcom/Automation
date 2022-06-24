@@ -20,7 +20,7 @@ namespace TestsFixer
         // 
         if (dirs.Length == 1)
         {
-          // The dir with the environments is found
+          // a dir with the environments is found
           foundFullPath = Path.Combine(currentPath, toFindPathName);
           return true;
         }

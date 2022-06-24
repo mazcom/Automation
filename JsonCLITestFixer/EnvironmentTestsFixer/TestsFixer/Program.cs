@@ -29,7 +29,7 @@ EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPa
 // 
 foreach (var environment in environmentsHolder.Environments)
 {
-  environment.FetchInformation();
+  environment.Patch();
 }
 
 //  

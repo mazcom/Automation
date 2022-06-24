@@ -18,8 +18,6 @@ namespace TestsFixer
       fileLines = File.ReadAllLines(fullFileName);
 
       // Find old db names, generate new names and replace where it occurs first time. 
-      //string? oldDbName = null;
-      //string? newDbName = null;
       for (int i = 0; i < fileLines.Length; i++)
       {
         var line = fileLines[i];
@@ -41,7 +39,7 @@ namespace TestsFixer
         }
       }
 
-      // Replace names in other places
+      // Replace names in other places.
       if (oldNewNames.Count > 0)
       {
         for (int i = 0; i < fileLines.Length; i++)
@@ -60,7 +58,6 @@ namespace TestsFixer
           }
         }
       }
-
 
       if (oldNewNames.Count > 0)
       {
