@@ -10,11 +10,13 @@ namespace TestsFixer.Model
   internal class Test
   {
     private readonly JObject jsonObject;
+    private readonly string testFullPath;
     private TestsEnvironment environment;
 
-    public Test(JObject jsonObject)
+    public Test(JObject jsonObject, string testFullPath)
     {
       this.jsonObject = jsonObject;
+      this.testFullPath = testFullPath;
       Id = Guid.Parse(jsonObject["id"]!.Value<string>()!);
       EnvironmentId = Guid.Parse(jsonObject["environment"]!.Value<string>()!);
       Name = jsonObject["name"]!.Value<string>()!;
@@ -35,6 +37,7 @@ namespace TestsFixer.Model
     {
       PatchDatabaseNames();
       PatchEnterprise();
+      PatchFiles();
     }
 
     public void PatchDatabaseNames()
@@ -62,7 +65,7 @@ namespace TestsFixer.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            createDbCommandLine = createDbCommandLine.Replace(currentServerName, "%sqllast%");
+            createDbCommandLine = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
           }
 
           token.Value = createDbCommandLine;
@@ -101,6 +104,71 @@ $@"{{
         Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
         Console.ResetColor();
       }
+    }
+
+    private void PatchFiles()
+    {
+      List<string> foundFileNames = new();
+      var testPath = Path.GetDirectoryName(this.testFullPath)!;
+
+      var runCommandLine = (JValue?)this.jsonObject.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!.FirstOrDefault();
+      if (runCommandLine != null)
+      {
+        var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+        foundFileNames.AddRange(fileNames.Except(foundFileNames));
+      }
+
+      var etalonFileName = (JValue?)this.jsonObject.SelectTokens("assert.files_equal[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
+      if (etalonFileName != null)
+      {
+        var fileNames = RegexHelper.ExtractAnyFileNames((string)etalonFileName!);
+        foundFileNames.AddRange(fileNames.Except(foundFileNames));
+      }
+
+
+      foreach (var file in foundFileNames)
+      {
+        var extension = Path.GetExtension(file).Replace(".", "");
+        var fileFullPath = Path.Combine(testPath, file);
+
+        // Scip files which does not exist, for example actual files 
+        if (!File.Exists(fileFullPath))
+        {
+          continue;
+        }
+
+        switch (extension)
+        {
+          case "scomp":
+          case "dcomp":
+            PatchCompFile(fileFullPath);
+            break;
+          case "sql":
+            PatchSqlFile(fileFullPath);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    private void PatchCompFile(string fileName)
+    {
+      string[]? fileLines = File.ReadAllLines(fileName);
+
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        //var line = fileLines[i];
+        fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
+        fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], environment.OldNewDatabaseNames);
+      }
+      File.WriteAllLines(fileName, fileLines);
+    }
+
+    private void PatchSqlFile(string fileName)
+    {
+      DBReplacer.TryToReplaceNamesInSQLFile(fileName, environment.OldNewDatabaseNames);
     }
   }
 }

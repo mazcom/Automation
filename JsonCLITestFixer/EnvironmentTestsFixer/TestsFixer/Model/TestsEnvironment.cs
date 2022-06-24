@@ -24,6 +24,8 @@ namespace TestsFixer.Model
     public List<string> NewDatabaseNames { get; } = new();
     public List<string> OldDatabaseNames { get; } = new();
 
+    public List<Tuple<string, string>> OldNewDatabaseNames { get; } = new();
+
     public bool Patch() => PatchDatabaseInfo();
 
     public string PatchError { get; private set; }
@@ -34,8 +36,6 @@ namespace TestsFixer.Model
       var createDbCommandLineNode = jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
         Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!.FirstOrDefault();
 
-      //foreach (var token in jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
-      //  Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
       if (createDbCommandLineNode != null) 
       {
         var createDbCommandLine = (string)createDbCommandLineNode!;
@@ -45,12 +45,13 @@ namespace TestsFixer.Model
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
 
         // Меняем имена баз данных в файлах создания баз данных.  
-        if (DBNamesReplacer.GenerateNamesAndReplaceInFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
+        if (DBReplacer.GenerateNamesAndReplaceInSqlFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
         {
           oldNewNames.ForEach(cf =>
           {
             OldDatabaseNames.Add(cf.Item1);
             NewDatabaseNames.Add(cf.Item2);
+            OldNewDatabaseNames.Add(cf);
           });
 
           Console.ForegroundColor = ConsoleColor.Green;
@@ -60,11 +61,7 @@ namespace TestsFixer.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, "%sqllast%");
-          }
-          else
-          {
-
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
           }
         }
         else
@@ -75,7 +72,7 @@ namespace TestsFixer.Model
             return false;
           }
         }
-
+        DBReplacer.TryToReplacePassword(createdatabaseFileFullPath);
         PatchCleanSection(sqlFileName);
       }
       return true;
@@ -87,6 +84,7 @@ namespace TestsFixer.Model
       var cleanUpNode = this.jsonObject.SelectTokens("clean_up", errorWhenNoMatch: false)!.FirstOrDefault();
       if (cleanUpNode != null)
       {
+        // do nothing if it does. 
         return;
       } 
 
@@ -99,7 +97,7 @@ $@"[{{
                 ""run"" : {{
                             ""code"" : {{
                                          ""type"" : ""cmd"",
-                                         ""code"" : ""%dbforgesql% /execute /connection:%sqllast% /inputfile:\""{cleanUpFileName}\""""
+                                         ""code"" : ""%dbforgesql% /execute /connection:{Constants.AffordableConnectionName} /inputfile:\""{cleanUpFileName}\""""
                             }}  
                 }},
                 ""exit_codes"":[

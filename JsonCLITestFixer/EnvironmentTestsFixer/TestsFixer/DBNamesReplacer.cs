@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 
 namespace TestsFixer
 {
-  internal static class DBNamesReplacer
+  internal static class DBReplacer
   {
-    public static bool GenerateNamesAndReplaceInFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched)
+    private static string[] patternsToSearchCreateDbNames = { 
+      @"(?<=SET\s+@db_name\s+=\s+N'+)\w+"
+      , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
+
+    private static string[] patternsToSearchUseDbNames = {
+      @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+"
+      , @"(?<=^USE\s+)\[?\w+\]?" };
+
+    public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched)
     {
       alreadyPatched = false;
       oldNewNames = new List<Tuple<string, string>>();
@@ -34,8 +42,8 @@ namespace TestsFixer
           }
         }
 
-        string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
-        foreach (var pattern in patterns)
+        //string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
+        foreach (var pattern in patternsToSearchCreateDbNames)
         {
           var match = Regex.Match(line, pattern);
 
@@ -58,8 +66,7 @@ namespace TestsFixer
         for (int i = 0; i < fileLines.Length; i++)
         {
           var line = fileLines[i];
-          string[] patterns = { @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+", @"(?<=^USE\s+)\w+" };
-          foreach (var pattern in patterns)
+          foreach (var pattern in patternsToSearchUseDbNames)
           {
             var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
 
@@ -81,6 +88,107 @@ namespace TestsFixer
       {
         return false;
       }
+    }
+
+    public static void TryToReplacePassword(string fullFileName)
+    {
+      string[]? fileLines = File.ReadAllLines(fullFileName);
+      var pattern = @"(?<=with\s+password\s+=\s+\')\w+";
+      bool replaced = false;
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        var line = fileLines[i];
+        var match = Regex.Match(line, pattern);
+        if (match.Success)
+        {
+          fileLines[i] = Regex.Replace(line, pattern, "123pwd!", RegexOptions.IgnoreCase);
+          replaced = true;
+        }
+
+        //string[] patterns = patternsToSearchCreateDbNames.Concat(patternsToSearchUseDbNames).ToArray();
+        //foreach (var pattern in patterns)
+        //{
+        //  var match = Regex.Match(line, pattern);
+        //  if (match.Success)
+        //  {
+        //  }
+        //}
+      }
+
+      if (replaced)
+      {
+        File.WriteAllLines(fullFileName, fileLines);
+      }
+    }
+
+    public static void TryToReplaceNamesInSQLFile(string fullFileName, List<Tuple<string, string>> oldNewNames)
+    {
+      string[]? fileLines = File.ReadAllLines(fullFileName);
+      bool replaced = false;
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        var line = fileLines[i];
+
+        string[] patterns = patternsToSearchCreateDbNames.Concat(patternsToSearchUseDbNames).ToArray();
+        foreach (var pattern in patterns)
+        {
+          var match = Regex.Match(line, pattern);
+
+          if (match.Success)
+          {
+            foreach (var oldNewName in oldNewNames)
+            {
+              if (line.Contains(oldNewName.Item1))
+              {
+                fileLines[i] = line.Replace(oldNewName.Item1, oldNewName.Item2);
+                replaced = true;
+                break;
+              }
+            }            
+          }
+        }
+      }
+
+      if (replaced)
+      {
+        File.WriteAllLines(fullFileName, fileLines);
+      }
+    }
+
+
+    public static string TryToReplaceServerNameInConnectionString(string line)
+    {
+      string pattern = @"(?<=Data Source=)[A-Za-z0-9_\:\(\)\*-s{0,}\\]+\s{0,};";
+      var match = Regex.Match(line, pattern);
+      if (match.Success)
+      {
+        line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty) + ";");
+      }
+
+      return line ;
+    }
+
+    /// <summary>
+    /// Replace SC1 in <Schema>SC1</Schema>
+    /// </summary>
+    public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
+    {
+      string pattern = @"(?<=\<Schema\>)\w+";
+      var match = Regex.Match(line, pattern);
+      if (match.Success)
+      {
+        foreach (var pair in oldNewDatabaseNames)
+        {
+          if (line.Contains(pair.Item1))
+          {
+            line = line.Replace(pair.Item1, pair.Item2); 
+            break;
+          }
+        }
+      }
+
+      return line;
     }
 
     public static bool Replace(string fullFileName, string from, string to)

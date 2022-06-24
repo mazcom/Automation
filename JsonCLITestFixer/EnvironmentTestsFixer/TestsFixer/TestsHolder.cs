@@ -38,7 +38,7 @@ namespace TestsFixer
             continue;
           }
 
-          AllTests.Add(new Test(jsonObject));
+          AllTests.Add(new Test(jsonObject, file));
           foundTestsInFileCount++;
         }
 
