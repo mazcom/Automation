@@ -9,9 +9,10 @@ Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\");
 
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\";
-string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Data Comparer\Command_Line\MappingOptions\CLR_as_BINARY\";
+//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Data Comparer\Command_Line\MappingOptions\CLR_as_BINARY\";
 
-//string pathToTests = Console.ReadLine()!;
+string pathToTests = Console.ReadLine()!;
+
 if (!Directory.Exists(pathToTests))
 {
   Console.WriteLine($"Directory ${pathToTests} does not exist!");
