@@ -14,8 +14,8 @@ namespace Common.Model
     {
       JsonObject = jsonObject;
       TestFullPath = testFullPath;
-      
-      EnvironmentId = Guid.Parse(jsonObject["environment"]!.Value<string>()!);
+
+      EnvironmentId = Guid.Parse(jsonObject!["environment"]!.Value<string>()!);
       Id = Guid.Parse(jsonObject["id"]!.Value<string>()!);
       Name = jsonObject["name"]!.Value<string>()!;
       Description = jsonObject["description"]!.Value<string>()!;
@@ -25,7 +25,7 @@ namespace Common.Model
 
     public JObject? JsonObject { get; set; }
 
-    public Guid Id { get;}
+    public Guid Id { get; }
 
     public string Name { get; }
 
@@ -44,8 +44,8 @@ namespace Common.Model
           var etalonNode = filesEqualNode.SelectTokens("[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
           var actualNode = filesEqualNode.SelectTokens("[*].actual", errorWhenNoMatch: false)!.FirstOrDefault();
 
-          // Секция files_equal может быть неправильно оформлена(а именно не как массив. Поэтому не получим здесь зданчение.)
-          if (etalonNode ==null)
+          // Секция files_equal может быть не правильно оформлена(а именно не как массив. Поэтому не получим здесь знанчение.)
+          if (etalonNode == null)
           {
             return;
           }
@@ -61,6 +61,74 @@ $@"{{
 
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
+        Console.ResetColor();
+      }
+    }
+
+    protected void PatchDatabaseNames(List<Tuple<string, string>> oldNewDbNames)
+    {
+      var createDbNodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains("/database:", StringComparison.OrdinalIgnoreCase))!;
+
+
+      foreach (JValue token in createDbNodes)
+      {
+        var createDbCommandLine = (string)token!;
+
+        for (int i = 0; i < oldNewDbNames.Count; i++)
+        {
+          var oldDatabase = oldNewDbNames[i].Item1;
+          var newDatabase = oldNewDbNames[i].Item2;
+
+          if (!createDbCommandLine.Contains(oldDatabase))
+          {
+            continue;
+          }
+
+          createDbCommandLine = createDbCommandLine.Replace(oldDatabase, newDatabase);
+
+          token.Value = createDbCommandLine;
+          break;
+        }
+
+      }
+      if (createDbNodes.Count() > 0)
+      {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The databases in the test {Id}-{Name} have been patched!");
+        Console.ResetColor();
+      }
+    }
+
+    protected void PatchServerName(List<Tuple<string, string>> oldNewDbNames)
+    {
+      var createDbNodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains("/connection:", StringComparison.OrdinalIgnoreCase))!;
+
+      foreach (JValue token in createDbNodes)
+      {
+        var createDbCommandLine = (string)token!;
+
+        for (int i = 0; i < oldNewDbNames.Count; i++)
+        {
+          var oldDatabase = oldNewDbNames[i].Item1;
+          var newDatabase = oldNewDbNames[i].Item2;
+
+          string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
+          if (currentServerName != null)
+          {
+            createDbCommandLine = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
+          }
+
+          token.Value = createDbCommandLine;
+          break;
+        }
+
+      }
+      if (createDbNodes.Count() > 0)
+      {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The servername in the test {Id}-{Name} have been patched!");
         Console.ResetColor();
       }
     }
@@ -90,7 +158,7 @@ $@"{{
         var extension = Path.GetExtension(file).Replace(".", "");
         var fileFullPath = Path.Combine(testPath, file);
 
-        // Scip files which does not exist, for example actual files 
+        // Skip files which does not exist, for example actual files 
         if (!File.Exists(fileFullPath))
         {
           continue;
@@ -118,7 +186,6 @@ $@"{{
       // Find old db names, generate new names and replace where it occurs first time. 
       for (int i = 0; i < fileLines.Length; i++)
       {
-        //var line = fileLines[i];
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
       }

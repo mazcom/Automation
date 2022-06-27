@@ -11,21 +11,10 @@ namespace NoEnvironmentTestsFixer.Model
 {
   public class TestModel: BaseTest
   {
-    //private readonly string testFullPath;
-
     public TestModel(JObject jsonObject, string testFullPath): base( jsonObject, testFullPath)
     {
-      //Id = (Guid)jsonObject.SelectToken("id")!;
-      //this.JsonObject = jsonObject;
-      //TestFullPath = testFullPath;
-
       Init();
     }
-
-    //public Guid Id { get; set; }
-
-    // Test JsonObject
-    //public JObject? JsonObject { get; set; }
 
     public List<FileModel> CreateDbFiles { get; set; } = new();
 
@@ -33,6 +22,8 @@ namespace NoEnvironmentTestsFixer.Model
 
     public void Patch(List<Tuple<string, string>> oldNewDbNames)
     {
+      PatchDatabaseNames(oldNewDbNames);
+      PatchServerName(oldNewDbNames);
       PatchDocTemplates(oldNewDbNames);
       PatchEnterprise();
     }
@@ -111,7 +102,6 @@ GO
         Console.ResetColor();
       }
     }
-
 
     private void Init()
     {
