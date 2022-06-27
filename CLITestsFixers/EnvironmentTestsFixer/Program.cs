@@ -4,9 +4,9 @@ using EnvironmentTestsFixer;
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\");
 
-//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\";
+string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\";
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\Authorization\";
-string pathToTests = Console.ReadLine()!;
+//string pathToTests = Console.ReadLine()!;
 
 
 if (!Directory.Exists(pathToTests))

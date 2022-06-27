@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Model;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,26 +9,18 @@ using System.Threading.Tasks;
 
 namespace EnvironmentTestsFixer.Model
 {
-  internal class Test
+  internal class Test : BaseTest
   {
-    private readonly JObject jsonObject;
-    private readonly string testFullPath;
     private TestsEnvironment environment;
 
-    public Test(JObject jsonObject, string testFullPath)
+    public Test(JObject jsonObject, string testFullPath) : base(jsonObject, testFullPath)
     {
-      this.jsonObject = jsonObject;
-      this.testFullPath = testFullPath;
-      Id = Guid.Parse(jsonObject["id"]!.Value<string>()!);
-      EnvironmentId = Guid.Parse(jsonObject["environment"]!.Value<string>()!);
-      Name = jsonObject["name"]!.Value<string>()!;
-      Description = jsonObject["description"]!.Value<string>()!;
     }
 
-    public Guid Id { get; }
-    public Guid EnvironmentId { get; }
-    public string Name { get; }
-    public string Description { get; set; }
+    //public Guid EnvironmentId { get; }
+    //public Guid Id { get; }
+    //public string Name { get; }
+    //public string Description { get; set; }
 
     public void SetEnvironment(TestsEnvironment environment)
     {
@@ -38,12 +31,12 @@ namespace EnvironmentTestsFixer.Model
     {
       PatchDatabaseNames();
       PatchEnterprise();
-      PatchFiles();
+      PatchDocTemplates(environment.OldNewDatabaseNames);
     }
 
     public void PatchDatabaseNames()
     {
-      var createDbNodes = this.jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+      var createDbNodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
         Where(t => ((string)t!).Contains("/database:", StringComparison.OrdinalIgnoreCase))!;
 
 
@@ -81,7 +74,7 @@ namespace EnvironmentTestsFixer.Model
         Console.ResetColor();
       }
     }
-    public void PatchEnterprise()
+    /*private void PatchEnterprise()
     {
       var enterprise = this.jsonObject.SelectTokens("assert.files_equal[*].condition", errorWhenNoMatch: false)!.FirstOrDefault();
       if (enterprise == null)
@@ -107,7 +100,7 @@ $@"{{
       }
     }
 
-    private void PatchFiles()
+    private void PatchFiles(List<Tuple<string, string>> oldNewDbNames)
     {
       List<string> foundFileNames = new();
       var testPath = Path.GetDirectoryName(this.testFullPath)!;
@@ -142,10 +135,10 @@ $@"{{
         {
           case "scomp":
           case "dcomp":
-            PatchCompFile(fileFullPath);
+            PatchCompFile(fileFullPath, oldNewDbNames);
             break;
           case "sql":
-            PatchSqlFile(fileFullPath);
+            PatchSqlFile(fileFullPath, oldNewDbNames);
             break;
           default:
             break;
@@ -153,7 +146,7 @@ $@"{{
       }
     }
 
-    private void PatchCompFile(string fileName)
+    private void PatchCompFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
       string[]? fileLines = File.ReadAllLines(fileName);
 
@@ -167,9 +160,9 @@ $@"{{
       File.WriteAllLines(fileName, fileLines);
     }
 
-    private void PatchSqlFile(string fileName)
+    private void PatchSqlFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
-      DBReplacer.TryToReplaceNamesInSQLFile(fileName, environment.OldNewDatabaseNames);
-    }
+      DBReplacer.TryToReplaceNamesInSQLFile(fileName, oldNewDbNames);
+    }*/
   }
 }

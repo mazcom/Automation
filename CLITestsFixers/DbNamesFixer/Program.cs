@@ -36,7 +36,7 @@ foreach (var testFile in files)
     string json = sr.ReadToEnd();
     jsonObjects = JArray.Parse(json);
 
-    foreach (var jsonObject in jsonObjects)
+    foreach (JObject jsonObject in jsonObjects)
     {
       var environment = (Guid)jsonObject.SelectToken("environment")!;
 
@@ -53,42 +53,8 @@ foreach (var testFile in files)
         continue;
       }
 
-      TestModel test = new() { Id = (Guid)jsonObject.SelectToken("id")! };
-
-      // СОЗДАНИЕ БАЗЫ ДАННЫХ.
-      foreach (var token in jsonObject.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
-      {
-        var createDbCommandLine = (string)token!;
-        // Получаем имя базы данных из теста like Databases.sql
-        var createDbFileName = FilesHelper.ExtractFileName(createDbCommandLine)!;
-        // Полный путь к файлу создания базы данных.
-        string initDbFullFileName = Path.Combine(currentDir, createDbFileName);
-        test.CreateDbFiles.Add(new FileModel() { FullPath = initDbFullFileName, FileName = createDbFileName });
-      }
-
-      // УДАЛЕНИЕ БАЗЫ ДАННЫХ.
-      foreach (var token in jsonObject.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
-      {
-        var cleanDbCommandLine = (string)token!;
-        // Получаем имя базы данных из теста like CleanUp.sql
-        var cleanUpDbFileName = FilesHelper.ExtractFileName(cleanDbCommandLine)!;
-        // Полный путь к файлу создания базы данных.
-        string cleanDbFullFileName = Path.Combine(currentDir, cleanUpDbFileName);
-        test.CleanDbFiles.Add(new FileModel() { FullPath = cleanDbFullFileName, FileName = cleanUpDbFileName });
-      }
-
-      test.JsonObject = (JObject)jsonObject;
+      TestModel test = new(jsonObject, testFile);
       tests.Add(test);
-
-      if (test.CleanDbFiles.Count == 0)
-      {
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"$ The test with id={test.Id} in the file ${testFile} does not have a clean.sql file!");
-        Console.ResetColor();
-      }
     }
   }
 
@@ -200,18 +166,29 @@ foreach (var testFile in files)
     foreach (var newCreateDbFile in newCreateDbFiles)
     {
       // Меняем имена баз данных в файлах создания баз данных.  
-      //if (DBNamesReplacer.GenerateAndReplace(newCreateDbFile, out List<Tuple<string, string>> oldNewNames))
       if (DBReplacer.GenerateNamesAndReplaceInSqlFile(newCreateDbFile, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
       {
 
-        newCleanDbFiles.ForEach(cf =>
+        if (newCleanDbFiles.Count > 0)
         {
-          // Меняем имена в файлах очистки баз данных.
-          foreach (var oldNewValue in oldNewNames)
+          newCleanDbFiles.ForEach(cf =>
           {
-            DBReplacer.Replace(cf, oldNewValue.Item1, oldNewValue.Item2);
-          }
-        });
+            // Меняем имена в файлах очистки баз данных.
+            foreach (var oldNewValue in oldNewNames)
+            {
+              DBReplacer.Replace(cf, oldNewValue.Item1, oldNewValue.Item2);
+            }
+          });
+          
+        }
+        else
+        {
+          // Создаеём секцию очистки в тесте и sql файл.
+          test.AddCleanSection(Path.GetFileName(newCreateDbFile), oldNewNames);
+        }
+
+        // Path templates, enterprise and etc.
+        test.Patch(oldNewNames);
       }
     }
   }
