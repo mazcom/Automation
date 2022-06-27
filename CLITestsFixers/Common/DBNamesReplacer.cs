@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace TestsFixer
+namespace Common
 {
-  internal static class DBReplacer
+  public static class DBReplacer
   {
     private static string[] CreateDbNamesPatterns = {
       @"(?<=SET\s+@db_name\s+=\s+N'+)\w+"
@@ -195,14 +195,17 @@ namespace TestsFixer
       {
         var line = fileLines[i];
 
-        string pattern = @"(?<=SET\s+@db_name\s+=\s+N'+)\w+";
-        var match = Regex.Match(line, pattern);
-
-        if (match.Success && string.Equals(from, match.Value, StringComparison.OrdinalIgnoreCase))
+        foreach (var pattern in CreateDbNamesPatterns)
         {
-          replaced = true;
-          string newLine = Regex.Replace(line, pattern, to, RegexOptions.IgnoreCase);
-          fileLines[i] = newLine;
+          //string pattern = @"(?<=SET\s+@db_name\s+=\s+N'+)\w+";
+          var match = Regex.Match(line, pattern);
+
+          if (match.Success && string.Equals(from, match.Value, StringComparison.OrdinalIgnoreCase))
+          {
+            replaced = true;
+            string newLine = Regex.Replace(line, pattern, to, RegexOptions.IgnoreCase);
+            fileLines[i] = newLine;
+          }
         }
       }
 
@@ -216,5 +219,6 @@ namespace TestsFixer
         return false;
       }
     }
+
   }
 }

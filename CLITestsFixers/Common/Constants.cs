@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestsFixer
+namespace Common
 {
-  internal class Constants
+  public class Constants
   {
     public const string AffordableConnectionName = "%sqllast%";
 

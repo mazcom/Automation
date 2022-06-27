@@ -1,4 +1,5 @@
-﻿using TestsFixer;
+﻿using Common;
+using EnvironmentTestsFixer;
 
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\");
