@@ -188,6 +188,7 @@ $@"{{
       {
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
+        fileLines[i] = DBReplacer.TryToReplaceDbNameInDataConnectionSection(fileLines[i]);
       }
       File.WriteAllLines(fileName, fileLines);
     }

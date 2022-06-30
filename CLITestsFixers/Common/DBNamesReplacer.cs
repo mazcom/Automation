@@ -183,6 +183,21 @@ namespace Common
       return line;
     }
 
+    /// <summary>
+    /// Replace DBFSQLSRV\SQL2014 <DataConnection>DBFSQLSRV\SQL2014</DataConnection>
+    /// </summary>
+    public static string TryToReplaceDbNameInDataConnectionSection(string line)
+    {
+      string pattern = @"(?<=\<DataConnection\>)\w+[\\]?\w{0,}";
+      var match = Regex.Match(line, pattern);
+      if (match.Success)
+      {
+        line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty));
+      }
+
+      return line;
+    }
+
     public static bool Replace(string fullFileName, string from, string to)
     {
       string[]? fileLines;
