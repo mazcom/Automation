@@ -76,7 +76,8 @@ namespace Common
 
             if (match.Success && !line.Contains("master"))
             {
-              string newDbName = oldNewNames.Where(e => e.Item1.Equals(match.Value, StringComparison.OrdinalIgnoreCase)).First().Item2;
+              string m = match.Value.Replace("[", string.Empty)!.Replace("]", string.Empty);
+              string newDbName = oldNewNames.Where(e => e.Item1.Equals(m, StringComparison.OrdinalIgnoreCase)).First().Item2;
               fileLines[i] = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
             }
           }
