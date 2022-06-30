@@ -9,13 +9,15 @@ namespace Common
 {
   public static class DBReplacer
   {
+    // Паттерны определяют инструкции в которых мы создаём базы данных.
     private static string[] CreateDbNamesPatterns = {
       @"(?<=SET\s+@db_name\s+=\s+N'+)\w+"
       , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
 
+    // Патерны определяют использование имён баз данных в скрипте.
     private static string[] UseDbNamesPatterns = {
       @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+"
-      , @"(?<=^USE\s+)\[?\w+\]?" };
+      , @"(?<=^(USE|ALTER DATABASE)\s+)\[?\w+\]?" };
 
     public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched)
     {

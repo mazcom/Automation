@@ -133,8 +133,9 @@ $@"{{
       }
     }
 
-    protected void PatchDocTemplates(List<Tuple<string, string>> oldNewDbNames)
+    protected void PatchDocTemplates(List<Tuple<string, string>> oldNewDbNames, PatchSession patchSession)
     {
+      
       List<string> foundFileNames = new();
       var testPath = Path.GetDirectoryName(TestFullPath)!;
 
@@ -159,7 +160,7 @@ $@"{{
         var fileFullPath = Path.Combine(testPath, file);
 
         // Skip files which does not exist, for example actual files 
-        if (!File.Exists(fileFullPath))
+        if (!File.Exists(fileFullPath) || patchSession.PatchedFiles.Contains(fileFullPath))
         {
           continue;
         }
@@ -168,9 +169,11 @@ $@"{{
         {
           case "scomp":
           case "dcomp":
+            patchSession.PatchedFiles.Add(fileFullPath);
             PatchCompFile(fileFullPath, oldNewDbNames);
             break;
           case "sql":
+            patchSession.PatchedFiles.Add(fileFullPath);
             PatchSqlFile(fileFullPath, oldNewDbNames);
             break;
           default:

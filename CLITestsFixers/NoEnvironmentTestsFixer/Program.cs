@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Common;
+using Common.Model;
 using Newtonsoft.Json.Linq;
 using NoEnvironmentTestsFixer;
 using NoEnvironmentTestsFixer.Model;
@@ -163,6 +164,7 @@ foreach (var testFile in files)
       newCleanDbFiles.Add(newCleanDbFileName);
     }
 
+    PatchSession patchSession = new();
     // меняем имена баз данных в файлах.
     foreach (var newCreateDbFile in newCreateDbFiles)
     {
@@ -189,7 +191,7 @@ foreach (var testFile in files)
         }
 
         // Path templates, enterprise and etc.
-        test.Patch(oldNewNames);
+        test.Patch(oldNewNames, patchSession);
       }
     }
   }

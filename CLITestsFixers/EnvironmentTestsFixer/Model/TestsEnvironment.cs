@@ -22,9 +22,6 @@ namespace EnvironmentTestsFixer.Model
 
     public List<Test> Tests { get; } = new();
 
-    public List<string> NewDatabaseNames { get; } = new();
-    public List<string> OldDatabaseNames { get; } = new();
-
     public List<Tuple<string, string>> OldNewDatabaseNames { get; } = new();
 
     public bool Patch() => PatchDatabaseInfo();
@@ -50,8 +47,6 @@ namespace EnvironmentTestsFixer.Model
         {
           oldNewNames.ForEach(cf =>
           {
-            OldDatabaseNames.Add(cf.Item1);
-            NewDatabaseNames.Add(cf.Item2);
             OldNewDatabaseNames.Add(cf);
           });
 
@@ -104,7 +99,7 @@ $@"[{{
                 ""exit_codes"":[
                   0
                 ],
-                ""timout"" : 120000
+                ""timeout"" : 120000
              }}     
   ]  
     
@@ -124,14 +119,14 @@ $@"[{{
       {
         StringBuilder sb = new();
 
-        foreach (var databaseName in NewDatabaseNames)
+        foreach (var databaseName in OldNewDatabaseNames)
         {
           string cleanSql =
 
 $@"USE [master]
 GO
 DECLARE @db_name NVARCHAR(255);
-SET @db_name = N'{databaseName}';
+SET @db_name = N'{databaseName.Item2}';
 IF EXISTS (SELECT 1 FROM sys.databases d WHERE d.name = @db_name)
 BEGIN
 EXEC msdb.dbo.sp_delete_database_backuphistory @db_name;

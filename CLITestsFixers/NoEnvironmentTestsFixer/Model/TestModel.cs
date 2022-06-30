@@ -20,12 +20,15 @@ namespace NoEnvironmentTestsFixer.Model
 
     public List<FileModel> CleanDbFiles { get; set; } = new();
 
-    public void Patch(List<Tuple<string, string>> oldNewDbNames)
+    public void Patch(List<Tuple<string, string>> oldNewDbNames, PatchSession patchSession)
     {
+      // Path a test info.
       PatchDatabaseNames(oldNewDbNames);
       PatchServerName(oldNewDbNames);
-      PatchDocTemplates(oldNewDbNames);
       PatchEnterprise();
+
+      // Patch the attached separate files(scomp, dcomp, dgen, etalon.sql and etc.) to a test.
+      PatchDocTemplates(oldNewDbNames, patchSession);
     }
 
     public void AddCleanSection(string createFileName, List<Tuple<string, string>> oldNewDbNames)
@@ -45,7 +48,7 @@ $@"[{{
                 ""exit_codes"":[
                   0
                 ],
-                ""timout"" : 120000
+                ""timeout"" : 120000
              }}     
   ]  
     

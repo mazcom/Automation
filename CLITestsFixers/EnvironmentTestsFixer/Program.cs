@@ -1,10 +1,12 @@
 ﻿using Common;
+using Common.Model;
 using EnvironmentTestsFixer;
+using EnvironmentTestsFixer.Model;
 
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\");
 
-string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Options\Comparison\IgnoreWithEncryption";
+string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Options\Comparison\IgnoreNextFilegroupsInPartitionSchemes";
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\Authorization\";
 //string pathToTests = Console.ReadLine()!;
 
@@ -29,6 +31,7 @@ EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPa
 Console.WriteLine($"Found total tests count {testsHolder.AllTests.Count}");
 Console.WriteLine($"Found total environments count {environmentsHolder.Environments.Count}");
 
+PatchSession patchSession = new();
 // Patch environments and tests.
 foreach (var environment in environmentsHolder.Environments)
 {
@@ -39,7 +42,7 @@ foreach (var environment in environmentsHolder.Environments)
     environment.Tests.ForEach(t =>
     {
       Console.WriteLine($"Start patching the test {environment.Id}-{environment.Name}...");
-      t.Patch();
+      t.Patch(patchSession);
     });
   }
   else
