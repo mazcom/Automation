@@ -43,7 +43,7 @@ namespace EnvironmentTestsFixer.Model
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
 
         // Меняем имена баз данных в файлах создания баз данных.  
-        if (DBReplacer.GenerateNamesAndReplaceInSqlFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
+        if (DBReplacer.GenerateNamesAndReplaceInSqlFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Id))
         {
           oldNewNames.ForEach(cf =>
           {

@@ -19,14 +19,14 @@ namespace Common
       @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+"
       , @"(?<=^(USE|ALTER DATABASE)\s+)\[?\w+\]?" };
 
-    public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched)
+    public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Guid preferedGuid = default)
     {
       alreadyPatched = false;
       oldNewNames = new List<Tuple<string, string>>();
       string[]? fileLines;
       
       // Предполагаем, что для всего файла нужно сгенерировать один GUID.
-      Guid guid = Guid.NewGuid();
+      Guid guid = preferedGuid == Guid.Empty ? Guid.NewGuid() : preferedGuid;
 
       // Читаем контент из файла и запоминаем.
       fileLines = File.ReadAllLines(fullFileName);
