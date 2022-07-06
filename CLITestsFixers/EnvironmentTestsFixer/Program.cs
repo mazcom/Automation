@@ -7,7 +7,7 @@ Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\");
 
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Options\Comparison\IgnoreNextFilegroupsInPartitionSchemes";
-//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\Functions\Authorization\";
+//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\2012\Columnstore Index\";
 string pathToTests = Console.ReadLine()!;
 
 
@@ -35,8 +35,8 @@ PatchSession patchSession = new();
 // Patch environments and tests.
 foreach (var environment in environmentsHolder.Environments)
 {
-  Console.WriteLine($"Start patching the environment {environment.Id}-{environment.Name}..."); 
-  if (environment.Patch())
+  Console.WriteLine($"Start patching the environment {environment.Id}-{environment.Name}...");
+  if (environment.Patch(patchSession))
   {
     Console.WriteLine($"The environment {environment.Id}-{environment.Name} has been successfully patched!");
     environment.Tests.ForEach(t =>
@@ -51,7 +51,6 @@ foreach (var environment in environmentsHolder.Environments)
     Console.WriteLine($"The environment {environment.Id}-{environment.Name} was not patched. The reason: {environment.PatchError}");
     Console.ResetColor();
   }
-  
 }
 
 environmentsHolder.SaveChanges();

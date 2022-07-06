@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Model;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
@@ -24,57 +25,94 @@ namespace EnvironmentTestsFixer.Model
 
     public List<Tuple<string, string>> OldNewDatabaseNames { get; } = new();
 
-    public bool Patch() => PatchDatabaseInfo();
+    public bool Patch(PatchSession patchSession) => PatchDatabaseInfo(patchSession);
 
     public string PatchError { get; private set; }
 
-    private bool PatchDatabaseInfo()
+    private bool PatchDatabaseInfo(PatchSession patchSession)
     {
       // СОЗДАНИЕ БАЗЫ ДАННЫХ.
-      var createDbCommandLineNode = jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!.FirstOrDefault();
+      var createDbCommandLineNodes = jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!.ToArray();
 
-      if (createDbCommandLineNode != null) 
+      if (createDbCommandLineNodes == null || createDbCommandLineNodes.Length == 0)
+      {
+        return true;
+      }
+
+      List<string> sqlFileNames = new();
+
+      foreach (var createDbCommandLineNode in createDbCommandLineNodes)
       {
         var createDbCommandLine = (string)createDbCommandLineNode!;
 
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
         var sqlFileName = RegexHelper.ExtractSqlFileName(createDbCommandLine)!;
+
+        if (!sqlFileNames.Contains(sqlFileName))
+        {
+          sqlFileNames.Add(sqlFileName);
+        }
+
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
 
-        // Меняем имена баз данных в файлах создания баз данных.  
-        if (DBReplacer.GenerateNamesAndReplaceInSqlFile(createdatabaseFileFullPath, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Id))
+        List<Tuple<string, string>> oldNewNames = new();
+
+        bool patched = false;
+
+        // Индикатор того, что файлик создания баз данных уже пропатчен давно. 
+        // Текущая сессия тоже не обладает информацией, как он был пропатчен.
+        bool alreadyPatched = false;
+
+        // Пробуем получить из сессиии. Возможно другой environment уже преобразовал
+        // и мы можем получить готовые имена баз данных.
+        if (patchSession.FileToOldNewNames.ContainsKey(createdatabaseFileFullPath))
         {
+          oldNewNames = patchSession.FileToOldNewNames[createdatabaseFileFullPath];
+        }
+        else
+        {
+          // Пробуем пропатчить файлик и получить имена баз данных.
+          patched = DBReplacer.GenerateNamesAndReplaceInSqlFile(createdatabaseFileFullPath, out oldNewNames, out alreadyPatched, Id);
+        }
+
+        if (alreadyPatched)
+        {
+          PatchError = "The environment seems to be already patched.";
+          return false;
+        }
+
+        if (oldNewNames.Count > 0)
+        {
+          if (patched)
+          {
+            patchSession.FileToOldNewNames[createdatabaseFileFullPath] = oldNewNames;
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"The file {createdatabaseFileFullPath} has been patched!");
+            Console.ResetColor();
+          }
+
           oldNewNames.ForEach(cf =>
           {
             OldNewDatabaseNames.Add(cf);
           });
-
-          Console.ForegroundColor = ConsoleColor.Green;
-          Console.WriteLine($"The file {createdatabaseFileFullPath} has been patched!");
-          Console.ResetColor();
 
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
             ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
           }
+
+          DBReplacer.TryToReplacePassword(createdatabaseFileFullPath);
         }
-        else
-        {
-          if (alreadyPatched)
-          {
-            PatchError = "The environment seems to be already patched.";
-            return false;
-          }
-        }
-        DBReplacer.TryToReplacePassword(createdatabaseFileFullPath);
-        PatchCleanSection(sqlFileName);
       }
+
+      PatchCleanSection(sqlFileNames);
       return true;
     }
 
-    private void PatchCleanSection(string createFileName)
+    private void PatchCleanSection(List<string> sqlFileNames)
     {
       // check whether the clean_up property already exists
       var cleanUpNode = this.jsonObject.SelectTokens("clean_up", errorWhenNoMatch: false)!.FirstOrDefault();
@@ -82,14 +120,30 @@ namespace EnvironmentTestsFixer.Model
       {
         // do nothing if it does. 
         return;
-      } 
+      }
 
-      string cleanUpFileName = createFileName.Insert(createFileName.IndexOf(".sql"), "_CleanUp");
+      List<string> cleanUpFileNames = new();
+
       string cleanUpSection =
 $@"[{{
 ""when"":""Always"",
-""actions"": [
-             {{
+""actions"": [";
+
+
+
+      for (int i = 0; i < sqlFileNames.Count; i++)
+      {
+        string createFileName = sqlFileNames[i];
+        string cleanUpFileName = createFileName.Insert(createFileName.IndexOf(".sql"), "_CleanUp");
+        cleanUpFileNames.Add(cleanUpFileName);
+
+        if (i > 0)
+        {
+          cleanUpSection += ",";
+        }
+        cleanUpSection +=
+          $@"
+{{
                 ""run"" : {{
                             ""code"" : {{
                                          ""type"" : ""cmd"",
@@ -100,30 +154,43 @@ $@"[{{
                   0
                 ],
                 ""timeout"" : 120000
-             }}     
-  ]  
+             }}
+          ";
+
+      }
+
+      cleanUpSection +=
+        $@"
+]  
     
-}}]";
+}}]
+";
+
       this.jsonObject.Add("clean_up", JProperty.Parse(cleanUpSection));
 
       Console.ForegroundColor = ConsoleColor.Green;
       Console.WriteLine($"The clean_up section has been added to an environment!");
       Console.ResetColor();
 
-      CreateCleanUpFile(cleanUpFileName);
+      CreateCleanUpFile(cleanUpFileNames);
     }
 
-    private void CreateCleanUpFile(string cleanUpFileName)
+    private void CreateCleanUpFile(List<string> cleanUpFileNames)
     {
-      if (!File.Exists(cleanUpFileName))
+      var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
+      foreach (var cleanUpFileName in cleanUpFileNames)
       {
-        StringBuilder sb = new();
+        var cleanUpFileFullPath = Path.Combine(environmentPath, cleanUpFileName);
 
-        foreach (var databaseName in OldNewDatabaseNames)
+        if (!File.Exists(cleanUpFileFullPath))
         {
-          string cleanSql =
+          StringBuilder sb = new();
 
-$@"USE [master]
+          foreach (var databaseName in OldNewDatabaseNames)
+          {
+            string cleanSql =
+
+  $@"USE [master]
 GO
 DECLARE @db_name NVARCHAR(255);
 SET @db_name = N'{databaseName.Item2}';
@@ -135,23 +202,22 @@ EXEC (N'DROP DATABASE '+@db_name);
 END;
 GO
 ";
-          if (sb.Length > 0)
-          {
-            sb.AppendLine(Environment.NewLine);
+            if (sb.Length > 0)
+            {
+              sb.AppendLine(Environment.NewLine);
+            }
+
+            sb.AppendLine(cleanSql);
           }
 
-          sb.AppendLine(cleanSql);
+          using (StreamWriter sw = File.CreateText(cleanUpFileFullPath))
+          {
+            sw.Write(sb.ToString());
+          }
+          Console.ForegroundColor = ConsoleColor.Green;
+          Console.WriteLine($"The clean_up file {cleanUpFileFullPath} has been created!");
+          Console.ResetColor();
         }
-
-        var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
-        var cleanUpFileFullPath = Path.Combine(environmentPath, cleanUpFileName);
-        using (StreamWriter sw = File.CreateText(cleanUpFileFullPath))
-        {
-          sw.Write(sb.ToString());
-        }
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"The clean_up file {cleanUpFileFullPath} has been created!");
-        Console.ResetColor();
       }
     }
   }
