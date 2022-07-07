@@ -169,7 +169,7 @@ foreach (var testFile in files)
     foreach (var newCreateDbFile in newCreateDbFiles)
     {
       // Меняем имена баз данных в файлах создания баз данных.  
-      if (DBReplacer.GenerateNamesAndReplaceInSqlFile(newCreateDbFile, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched))
+      if (DBReplacer.GenerateNamesAndReplaceInSqlFile(newCreateDbFile, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, test.Id))
       {
 
         if (newCleanDbFiles.Count > 0)
