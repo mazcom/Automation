@@ -46,6 +46,16 @@ namespace EnvironmentTestsFixer.Model
       {
         var createDbCommandLine = (string)createDbCommandLineNode!;
 
+        if (!RegexHelper.CheckIncorrectCmdLine(createDbCommandLine, out string? error))
+        {
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.WriteLine($"A cmd line in the environment {Id} is incorrect. {error}");
+          Console.ResetColor();
+
+          continue;
+        }
+
+
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
         var sqlFileName = RegexHelper.ExtractSqlFileName(createDbCommandLine)!;
 
@@ -55,6 +65,16 @@ namespace EnvironmentTestsFixer.Model
         }
 
         var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
+
+        if (!File.Exists(createdatabaseFileFullPath))
+        {
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.WriteLine($"The file {createdatabaseFileFullPath} does not exist!");
+          Console.ResetColor();
+
+          continue;
+        }
+
 
         List<Tuple<string, string>> oldNewNames = new();
 
