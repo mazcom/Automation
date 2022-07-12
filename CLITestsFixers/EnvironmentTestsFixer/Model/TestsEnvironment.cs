@@ -47,7 +47,7 @@ namespace EnvironmentTestsFixer.Model
         var createDbCommandLine = (string)createDbCommandLineNode!;
 
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
-        var sqlFileName = RegexHelper.ExtractSqlFileName(createDbCommandLine)!;
+        var sqlFileName = RegexHelper.ExtractSqlFileNameFromCommandLine(createDbCommandLine)!;
 
         if (!sqlFileNames.Contains(sqlFileName))
         {

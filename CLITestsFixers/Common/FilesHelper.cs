@@ -13,14 +13,21 @@ namespace Common
     //private static readonly Regex rxIncorrectExecuteCommand = new(@"/execute\s+[A-Za-z0-9_\s-\(\)]+\.sql", RegexOptions.IgnoreCase);
 
 
-    private static readonly Regex rxSqlFileName = new(@"[A-Za-z0-9_\s-\(\)]+\.sql", RegexOptions.IgnoreCase);
+    // Обробатываем случаи:
+    // /inputfile:\"Database2014.sql\""
+    // /inputfile:Database2014.sql
+    // /execute Databases.sql
+    // /execute "..\DatabasesOptions2014x.sql"
+    private static readonly Regex rxSqlFileNameInCommandLine = new(@"((..\\)[A-Za-z0-9_\s-\(\)]+\.sql)|(\s[A-Za-z0-9_\s-\(\)]+\.sql\s?)|((?<=\/inputfile:\\?""?)[A-Za-z0-9_\s-\(\)]+\.sql)", RegexOptions.IgnoreCase);
+
+
     private static readonly Regex rxAnyFileName = new(@"[A-Za-z0-9_\s-\(\)]+\.[A-Za-z0-9]+", RegexOptions.IgnoreCase);
     private static readonly Regex rxServerName = new(@"(?<=\/connection:)%[A-Za-z0-9_\:\(\)\*-]+%", RegexOptions.IgnoreCase);
 
-    public static string? ExtractSqlFileName(string fromCommandLine)
+    public static string? ExtractSqlFileNameFromCommandLine(string fromCommandLine)
     {
-      MatchCollection matches = rxSqlFileName.Matches(fromCommandLine);
-      return matches.Count == 0 ? null : matches.First().Value;
+      MatchCollection matches = rxSqlFileNameInCommandLine.Matches(fromCommandLine);
+      return matches.Count == 0 ? null : matches.First().Value.Trim();
     }
 
     public static string[] ExtractAnyFileNames(string fromCommandLine)
