@@ -11,8 +11,9 @@ namespace Common
   {
     // Паттерны определяют инструкции в которых мы создаём базы данных.
     private static string[] CreateDbNamesPatterns = {
-      @"(?<=SET\s+(@db_name|@name_db)\s+=\s+N'+)\w+"
-      , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
+      @"(?<=SET\s+(@db_name|@name_db)\s*=\s*N'+)\w+"
+      , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
+      ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
     private static string[] UseDbNamesPatterns = {
