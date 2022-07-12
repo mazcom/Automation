@@ -46,16 +46,6 @@ namespace EnvironmentTestsFixer.Model
       {
         var createDbCommandLine = (string)createDbCommandLineNode!;
 
-        if (!RegexHelper.CheckIncorrectCmdLine(createDbCommandLine, out string? error))
-        {
-          Console.ForegroundColor = ConsoleColor.Red;
-          Console.WriteLine($"A cmd line in the environment {Id} is incorrect. {error}");
-          Console.ResetColor();
-
-          continue;
-        }
-
-
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
         var sqlFileName = RegexHelper.ExtractSqlFileName(createDbCommandLine)!;
 

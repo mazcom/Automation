@@ -10,7 +10,7 @@ namespace Common
   public class RegexHelper
   {
     // После /execute не может идти сразу имя sql-файла.
-    private static readonly Regex rxIncorrectExecuteCommand = new(@"/execute\s+[A-Za-z0-9_\s-\(\)]+\.sql", RegexOptions.IgnoreCase);
+    //private static readonly Regex rxIncorrectExecuteCommand = new(@"/execute\s+[A-Za-z0-9_\s-\(\)]+\.sql", RegexOptions.IgnoreCase);
 
 
     private static readonly Regex rxSqlFileName = new(@"[A-Za-z0-9_\s-\(\)]+\.sql", RegexOptions.IgnoreCase);
@@ -40,20 +40,20 @@ namespace Common
     /// <param name="fromCommandLine"></param>
     /// <param name="error"></param>
     /// <returns>true - ok(no error), false - there is en arror </returns>
-    public static bool CheckIncorrectCmdLine(string fromCommandLine, out string? error)
-    {
-      error = null;
-      MatchCollection matches = rxIncorrectExecuteCommand.Matches(fromCommandLine);
+    //public static bool CheckIncorrectCmdLine(string fromCommandLine, out string? error)
+    //{
+    //  error = null;
+    //  MatchCollection matches = rxIncorrectExecuteCommand.Matches(fromCommandLine);
 
-      if (matches.Count == 0)
-      {
-        return true;
-      }
-      else
-      {
-        error = $"The command \"{matches.First().Value}\" is incorrect.";
-        return false;
-      }
-    }
+    //  if (matches.Count == 0)
+    //  {
+    //    return true;
+    //  }
+    //  else
+    //  {
+    //    error = $"The command \"{matches.First().Value}\" is incorrect.";
+    //    return false;
+    //  }
+    //}
   }
 }
