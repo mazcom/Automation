@@ -57,11 +57,10 @@ $@"{{
 ""actual"": ""{actualNode!.Value<string>()}""    
 }}";
           ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
+          Console.ForegroundColor = ConsoleColor.Green;
+          Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
+          Console.ResetColor();
         }
-
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
-        Console.ResetColor();
       }
     }
 
