@@ -44,10 +44,35 @@ namespace Common.Model
           var etalonNode = filesEqualNode.SelectTokens("[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
           var actualNode = filesEqualNode.SelectTokens("[*].actual", errorWhenNoMatch: false)!.FirstOrDefault();
 
-          // Секция files_equal может быть не правильно оформлена(а именно не как массив. Поэтому не получим здесь знанчение.)
+          // Секция files_equal может быть не правильно оформлена(а именно не как массив. Поэтому не получим здесь значение.)
           if (etalonNode == null)
           {
-            return;
+            // пробуем исправить ситуацию.
+            etalonNode = filesEqualNode.SelectTokens("etalon", errorWhenNoMatch: false)!.FirstOrDefault();
+            actualNode = filesEqualNode.SelectTokens("actual", errorWhenNoMatch: false)!.FirstOrDefault();
+
+            if (etalonNode == null)
+            {
+              Console.ForegroundColor = ConsoleColor.Red;
+              Console.WriteLine($"The seaction files_equal was not in correct format.");
+              Console.ResetColor();
+              return;
+            }
+
+            var assertNode = (JObject)JsonObject!.SelectTokens("assert", errorWhenNoMatch: false)!.FirstOrDefault()!;
+
+            string files_equalSection =
+$@"
+[
+             {{
+                ""etalon"" : ""{etalonNode!.Value<string>()}"",
+                ""actual"" : ""{actualNode!.Value<string>()}""
+             }}     
+]  
+";
+            assertNode!.Property("files_equal")!.Remove();
+            assertNode!.Add("files_equal", JArray.Parse(files_equalSection));
+            filesEqualNode = JsonObject!.SelectTokens("assert.files_equal", errorWhenNoMatch: false)!.FirstOrDefault();
           }
 
           string addenterpriseSection =
@@ -134,7 +159,7 @@ $@"{{
 
     protected void PatchDocTemplates(List<Tuple<string, string>> oldNewDbNames, PatchSession patchSession)
     {
-      
+
       List<string> foundFileNames = new();
       var testPath = Path.GetDirectoryName(TestFullPath)!;
 
@@ -171,6 +196,10 @@ $@"{{
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchCompFile(fileFullPath, oldNewDbNames);
             break;
+          case "backup":
+            patchSession.PatchedFiles.Add(fileFullPath);
+            PatchBackupFile(fileFullPath, oldNewDbNames);
+            break;
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchSqlFile(fileFullPath, oldNewDbNames);
@@ -191,6 +220,19 @@ $@"{{
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInDataConnectionSection(fileLines[i]);
+      }
+      File.WriteAllLines(fileName, fileLines);
+    }
+
+    private void PatchBackupFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
+    {
+      string[]? fileLines = File.ReadAllLines(fileName);
+
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
+        fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
       }
       File.WriteAllLines(fileName, fileLines);
     }

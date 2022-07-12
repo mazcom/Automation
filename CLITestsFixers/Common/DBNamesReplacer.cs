@@ -166,10 +166,12 @@ namespace Common
 
     /// <summary>
     /// Replace SC1 in <Schema>SC1</Schema>
+    /// or
+    /// Replace SC1 in <Database>SC1</Database>
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"(?<=\<Schema\>)\w+";
+      string pattern = @"((?<=\<Schema\>)|(?<=\<Database\>))\w+";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
