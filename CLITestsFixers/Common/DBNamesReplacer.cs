@@ -171,10 +171,12 @@ namespace Common
     /// Replace SC1 in <Database>SC1</Database>
     /// or
     /// Replace autotest_dataexport in <DatabaseObject>autotest_dataexport.dbo.FormatsTest</DatabaseObject>
+    /// or
+    /// <PropertyValue Name="TargetTable" xml:space="preserve">autotest_dataimport.dbo.saleperson</PropertyValue>
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"((?<=\<Schema\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>))\w+";
+      string pattern = @"(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {

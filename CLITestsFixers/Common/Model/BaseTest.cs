@@ -201,8 +201,9 @@ $@"{{
             PatchBackupFile(fileFullPath, oldNewDbNames);
             break;
           case "det":
+          case "dit":
             patchSession.PatchedFiles.Add(fileFullPath);
-            PatchExportFile(fileFullPath, oldNewDbNames);
+            PatchExportImportFile(fileFullPath, oldNewDbNames);
             break;
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
@@ -241,7 +242,7 @@ $@"{{
       File.WriteAllLines(fileName, fileLines);
     }
 
-    private void PatchExportFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
+    private void PatchExportImportFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
       string[]? fileLines = File.ReadAllLines(fileName);
 
