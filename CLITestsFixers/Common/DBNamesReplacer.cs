@@ -176,7 +176,7 @@ namespace Common
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
+      string pattern = @"(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<DatabaseName\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {

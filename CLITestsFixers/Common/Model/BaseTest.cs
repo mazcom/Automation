@@ -196,14 +196,12 @@ $@"{{
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchCompFile(fileFullPath, oldNewDbNames);
             break;
-          case "backup":
-            patchSession.PatchedFiles.Add(fileFullPath);
-            PatchBackupFile(fileFullPath, oldNewDbNames);
-            break;
           case "det":
           case "dit":
+          case "backup":
+          case "dgen":
             patchSession.PatchedFiles.Add(fileFullPath);
-            PatchExportImportFile(fileFullPath, oldNewDbNames);
+            PatchOtherFile(fileFullPath, oldNewDbNames);
             break;
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
@@ -229,20 +227,7 @@ $@"{{
       File.WriteAllLines(fileName, fileLines);
     }
 
-    private void PatchBackupFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
-    {
-      string[]? fileLines = File.ReadAllLines(fileName);
-
-      // Find old db names, generate new names and replace where it occurs first time. 
-      for (int i = 0; i < fileLines.Length; i++)
-      {
-        fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
-        fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
-      }
-      File.WriteAllLines(fileName, fileLines);
-    }
-
-    private void PatchExportImportFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
+    private void PatchOtherFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
       string[]? fileLines = File.ReadAllLines(fileName);
 
