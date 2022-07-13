@@ -11,8 +11,8 @@ namespace Common
   {
     // Паттерны определяют инструкции в которых мы создаём базы данных.
     private static string[] CreateDbNamesPatterns = {
-      @"(?<=SET\s+(@db_name|@name_db)\s*=\s*N'+)\w+"
-      , @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
+      @"(?<=SET\s+(@db_name|@name_db|@DatabaseName)\s*=\s*N'+)\w+"
+      ,@"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
       ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
@@ -169,10 +169,12 @@ namespace Common
     /// Replace SC1 in <Schema>SC1</Schema>
     /// or
     /// Replace SC1 in <Database>SC1</Database>
+    /// or
+    /// Replace autotest_dataexport in <DatabaseObject>autotest_dataexport.dbo.FormatsTest</DatabaseObject>
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"((?<=\<Schema\>)|(?<=\<Database\>))\w+";
+      string pattern = @"((?<=\<Schema\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>))\w+";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {

@@ -78,8 +78,8 @@ $@"
           string addenterpriseSection =
 $@"{{
 ""condition"": ""Enterprise"",
-""etalon"": ""{etalonNode!.Value<string>()}"",
-""actual"": ""{actualNode!.Value<string>()}""    
+""etalon"": ""{etalonNode!.Value<string>().Replace(@"\", @"\\")}"",
+""actual"": ""{actualNode!.Value<string>().Replace(@"\", @"\\")}""    
 }}";
           ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
           Console.ForegroundColor = ConsoleColor.Green;
@@ -200,6 +200,10 @@ $@"{{
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchBackupFile(fileFullPath, oldNewDbNames);
             break;
+          case "det":
+            patchSession.PatchedFiles.Add(fileFullPath);
+            PatchExportFile(fileFullPath, oldNewDbNames);
+            break;
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchSqlFile(fileFullPath, oldNewDbNames);
@@ -225,6 +229,19 @@ $@"{{
     }
 
     private void PatchBackupFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
+    {
+      string[]? fileLines = File.ReadAllLines(fileName);
+
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
+        fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
+      }
+      File.WriteAllLines(fileName, fileLines);
+    }
+
+    private void PatchExportFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
       string[]? fileLines = File.ReadAllLines(fileName);
 
