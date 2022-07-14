@@ -128,6 +128,7 @@ namespace EnvironmentTestsFixer.Model
       var cleanUpNode = this.jsonObject.SelectTokens("clean_up", errorWhenNoMatch: false)!.FirstOrDefault();
       if (cleanUpNode != null)
       {
+        // Меняем имя соединения.
         var runCommandLineNode = this.jsonObject!.SelectTokens("clean_up[*].actions[*].run.code.code", errorWhenNoMatch: false)!.FirstOrDefault();
         if (runCommandLineNode != null)
         {
@@ -138,6 +139,14 @@ namespace EnvironmentTestsFixer.Model
             ((JValue)runCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
           }
         }
+
+        // Меняем имя timeout.
+        var timeOutNode = this.jsonObject!.SelectTokens("clean_up[*].actions[*].timeout", errorWhenNoMatch: false)!.FirstOrDefault();
+        if (timeOutNode != null)
+        {
+          ((JValue)timeOutNode).Value = 120000;
+        }
+
         // do nothing if it does. 
         return;
       }
