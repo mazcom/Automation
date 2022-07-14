@@ -13,12 +13,14 @@ namespace Common
     private static string[] CreateDbNamesPatterns = {
       @"(?<=SET\s+(@db_name|@name_db|@DatabaseName)\s*=\s*N'+)\w+"
       ,@"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
-      ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"};
+      ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"
+      ,@"(?<=DROP\s+DATABASE\s+IF\s+EXISTS\s+)\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
     private static string[] UseDbNamesPatterns = {
       @"(?<=IF\s+DB_NAME\(\)\s+<>\s+N')\w+"
-      , @"(?<=^(USE|ALTER DATABASE)\s+)\[?\w+\]?" };
+      , @"(?<=^(USE|ALTER DATABASE)\s+)\[?\w+\]?"
+      , @"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
 
     public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Guid preferedGuid = default)
     {
@@ -79,7 +81,7 @@ namespace Common
             {
               string m = match.Value.Replace("[", string.Empty)!.Replace("]", string.Empty);
               string newDbName = oldNewNames.Where(e => e.Item1.Equals(m, StringComparison.OrdinalIgnoreCase)).First().Item2;
-              fileLines[i] = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
+              fileLines[i] = fileLines[i].Replace(m, newDbName);//Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
             }
           }
         }
