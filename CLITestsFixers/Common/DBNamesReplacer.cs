@@ -81,7 +81,7 @@ namespace Common
             {
               string m = match.Value.Replace("[", string.Empty)!.Replace("]", string.Empty);
               string newDbName = oldNewNames.Where(e => e.Item1.Equals(m, StringComparison.OrdinalIgnoreCase)).First().Item2;
-              fileLines[i] = fileLines[i].Replace(m, newDbName);//Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
+              fileLines[i] = fileLines[i].Replace(m,newDbName);//Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
             }
           }
         }
@@ -178,7 +178,7 @@ namespace Common
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<DatabaseName\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
+      string pattern = @"(<TargetTableName)|(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<DatabaseName\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
