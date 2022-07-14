@@ -35,7 +35,7 @@ namespace Common.Model
 
     public void PatchEnterprise()
     {
-      string[] entkeys = { "files_equal", "directory_equal"};
+      string[] entkeys = { "files_equal", "directory_equal", "console_output_equal" };
 
       foreach (var entkey in entkeys)
       {
@@ -79,13 +79,35 @@ namespace Common.Model
               filesEqualNode = JsonObject!.SelectTokens($"assert.{entkey}", errorWhenNoMatch: false)!.FirstOrDefault();
             }
 
-            string addenterpriseSection =
-  $@"{{
+            string addenterpriseSection;
+
+            if (entkey == "console_output_equal")
+            {
+              addenterpriseSection =
+              $@"{{
+""condition"": ""Enterprise"",
+""etalon"": {{
+  ""standard_output"": ""{etalonNode!.SelectTokens("standard_output", errorWhenNoMatch: false)!.FirstOrDefault().Value<string>().Replace(@"\", @"\\")}""
+}}
+
+}}";
+
+            }
+            else
+            {
+              addenterpriseSection =
+              $@"{{
 ""condition"": ""Enterprise"",
 ""etalon"": ""{etalonNode!.Value<string>().Replace(@"\", @"\\")}"",
 ""actual"": ""{actualNode!.Value<string>().Replace(@"\", @"\\")}""    
 }}";
+            }
+
+
             ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
+
+
+
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
             Console.ResetColor();
@@ -206,7 +228,7 @@ namespace Common.Model
         if (!File.Exists(fileFullPath))
         {
           continue;
-        }  
+        }
 
         // Skip files which does not exist, for example actual files 
         if (!File.Exists(fileFullPath) || patchSession.PatchedFiles.Contains(fileFullPath))

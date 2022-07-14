@@ -14,6 +14,7 @@ namespace Common
       @"(?<=SET\s+(@db_name|@name_db|@DatabaseName)\s*=\s*N'+)\w+"
       ,@"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
       ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"
+      ,@"(?<=\s*WHERE\s*\[name\] =\s*N'+)\w+"
       ,@"(?<=DROP\s+DATABASE\s+IF\s+EXISTS\s+)\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
