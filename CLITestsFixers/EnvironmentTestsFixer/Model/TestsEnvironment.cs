@@ -128,6 +128,16 @@ namespace EnvironmentTestsFixer.Model
       var cleanUpNode = this.jsonObject.SelectTokens("clean_up", errorWhenNoMatch: false)!.FirstOrDefault();
       if (cleanUpNode != null)
       {
+        var runCommandLineNode = this.jsonObject!.SelectTokens("clean_up[*].actions[*].run.code.code", errorWhenNoMatch: false)!.FirstOrDefault();
+        if (runCommandLineNode != null)
+        {
+          var createDbCommandLine = (string)runCommandLineNode!;
+          string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
+          if (currentServerName != null)
+          {
+            ((JValue)runCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
+          }
+        }
         // do nothing if it does. 
         return;
       }

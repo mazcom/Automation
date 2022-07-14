@@ -35,34 +35,38 @@ namespace Common.Model
 
     public void PatchEnterprise()
     {
-      var enterprise = JsonObject!.SelectTokens("assert.files_equal[*].condition", errorWhenNoMatch: false)!.FirstOrDefault();
-      if (enterprise == null)
+      string[] entkeys = { "files_equal", "directory_equal"};
+
+      foreach (var entkey in entkeys)
       {
-        var filesEqualNode = JsonObject!.SelectTokens("assert.files_equal", errorWhenNoMatch: false)!.FirstOrDefault();
-        if (filesEqualNode != null)
+        var enterprise = JsonObject!.SelectTokens($"assert.{entkey}[*].condition", errorWhenNoMatch: false)!.FirstOrDefault();
+        if (enterprise == null)
         {
-          var etalonNode = filesEqualNode.SelectTokens("[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
-          var actualNode = filesEqualNode.SelectTokens("[*].actual", errorWhenNoMatch: false)!.FirstOrDefault();
-
-          // Секция files_equal может быть не правильно оформлена(а именно не как массив. Поэтому не получим здесь значение.)
-          if (etalonNode == null)
+          var filesEqualNode = JsonObject!.SelectTokens($"assert.{entkey}", errorWhenNoMatch: false)!.FirstOrDefault();
+          if (filesEqualNode != null)
           {
-            // пробуем исправить ситуацию.
-            etalonNode = filesEqualNode.SelectTokens("etalon", errorWhenNoMatch: false)!.FirstOrDefault();
-            actualNode = filesEqualNode.SelectTokens("actual", errorWhenNoMatch: false)!.FirstOrDefault();
+            var etalonNode = filesEqualNode.SelectTokens("[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
+            var actualNode = filesEqualNode.SelectTokens("[*].actual", errorWhenNoMatch: false)!.FirstOrDefault();
 
+            // Секция files_equal может быть не правильно оформлена(а именно не как массив. Поэтому не получим здесь значение.)
             if (etalonNode == null)
             {
-              Console.ForegroundColor = ConsoleColor.Red;
-              Console.WriteLine($"The seaction files_equal was not in correct format.");
-              Console.ResetColor();
-              return;
-            }
+              // пробуем исправить ситуацию.
+              etalonNode = filesEqualNode.SelectTokens("etalon", errorWhenNoMatch: false)!.FirstOrDefault();
+              actualNode = filesEqualNode.SelectTokens("actual", errorWhenNoMatch: false)!.FirstOrDefault();
 
-            var assertNode = (JObject)JsonObject!.SelectTokens("assert", errorWhenNoMatch: false)!.FirstOrDefault()!;
+              if (etalonNode == null)
+              {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"The seaction files_equal was not in correct format.");
+                Console.ResetColor();
+                return;
+              }
 
-            string files_equalSection =
-$@"
+              var assertNode = (JObject)JsonObject!.SelectTokens("assert", errorWhenNoMatch: false)!.FirstOrDefault()!;
+
+              string files_equalSection =
+  $@"
 [
              {{
                 ""etalon"" : ""{etalonNode!.Value<string>()}"",
@@ -70,21 +74,22 @@ $@"
              }}     
 ]  
 ";
-            assertNode!.Property("files_equal")!.Remove();
-            assertNode!.Add("files_equal", JArray.Parse(files_equalSection));
-            filesEqualNode = JsonObject!.SelectTokens("assert.files_equal", errorWhenNoMatch: false)!.FirstOrDefault();
-          }
+              assertNode!.Property($"{entkey}")!.Remove();
+              assertNode!.Add($"{entkey}", JArray.Parse(files_equalSection));
+              filesEqualNode = JsonObject!.SelectTokens($"assert.{entkey}", errorWhenNoMatch: false)!.FirstOrDefault();
+            }
 
-          string addenterpriseSection =
-$@"{{
+            string addenterpriseSection =
+  $@"{{
 ""condition"": ""Enterprise"",
 ""etalon"": ""{etalonNode!.Value<string>().Replace(@"\", @"\\")}"",
 ""actual"": ""{actualNode!.Value<string>().Replace(@"\", @"\\")}""    
 }}";
-          ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
-          Console.ForegroundColor = ConsoleColor.Green;
-          Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
-          Console.ResetColor();
+            ((JArray)filesEqualNode).Add(JObject.Parse(addenterpriseSection));
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"The Enterprise section in the test {Id}-{Name} has been added!");
+            Console.ResetColor();
+          }
         }
       }
     }
@@ -163,12 +168,26 @@ $@"{{
       List<string> foundFileNames = new();
       var testPath = Path.GetDirectoryName(TestFullPath)!;
 
-      var runCommandLine = (JValue?)JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!.FirstOrDefault();
-      if (runCommandLine != null)
+      foreach (JValue? runCommandLine in JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!)
       {
         var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
         foundFileNames.AddRange(fileNames.Except(foundFileNames));
       }
+
+      foreach (JValue? runCommandLine in JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!)
+      {
+        var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+        foundFileNames.AddRange(fileNames.Except(foundFileNames));
+      }
+
+      //var runCommandLine = (JValue?)JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!.FirstOrDefault();
+      //if (runCommandLine != null)
+      //{
+      //  var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+      //  foundFileNames.AddRange(fileNames.Except(foundFileNames));
+      //}
+
+
 
       var etalonFileName = (JValue?)JsonObject!.SelectTokens("assert.files_equal[*].etalon", errorWhenNoMatch: false)!.FirstOrDefault();
       if (etalonFileName != null)
@@ -182,6 +201,12 @@ $@"{{
       {
         var extension = Path.GetExtension(file).Replace(".", "");
         var fileFullPath = Path.Combine(testPath, file);
+
+        // Если файла нет, то ничего не делаем. Можем просто некорректно выпарсить из командной строки имя файла.
+        if (!File.Exists(fileFullPath))
+        {
+          continue;
+        }  
 
         // Skip files which does not exist, for example actual files 
         if (!File.Exists(fileFullPath) || patchSession.PatchedFiles.Contains(fileFullPath))
