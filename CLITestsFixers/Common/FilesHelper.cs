@@ -42,6 +42,27 @@ namespace Common
       return matches.Count == 0 ? null : matches.First().Value;
     }
 
+    public static void WriteAllLines(string fileName, string[]? fileLines)
+    {
+      if (fileName == null)
+        throw new ArgumentNullException("fileName");
+      if (fileLines == null)
+        throw new ArgumentNullException("fileLines");
+
+      var sb = new StringBuilder();
+
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        if (i != 0)
+        {
+          sb.Append(Environment.NewLine);
+        }
+        sb.Append(fileLines[i]);
+      }
+
+      using StreamWriter sw = new StreamWriter(fileName, append: false);
+      sw.Write(sb.ToString());
+    }
     /// <summary>
     /// </summary>
     /// <param name="fromCommandLine"></param>

@@ -160,7 +160,7 @@ namespace Common
 
       if (replaced)
       {
-        File.WriteAllLines(fullFileName, fileLines);
+        RegexHelper.WriteAllLines(fullFileName, fileLines);
       }
     }
 
