@@ -180,6 +180,37 @@ namespace Common.Model
       }
     }
 
+    protected void PatchBackupName()
+    {
+      var nodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".bak", StringComparison.OrdinalIgnoreCase))!;
+
+      var nodes2 = JsonObject!.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".bak", StringComparison.OrdinalIgnoreCase))!;
+
+      nodes = nodes.Concat(nodes2);
+
+      foreach (JValue runToken in nodes)
+      {
+        var сommandLine = (string)runToken!;
+
+        var fileNames = RegexHelper.ExtractAnyFileNames((string)сommandLine!);
+        string fileName = fileNames.FirstOrDefault(f => f.EndsWith(".bak"))!;
+        if (fileName != null)
+        {
+          сommandLine = сommandLine.Replace(fileName, fileName.Insert(fileName.IndexOf(".bak"), "_" + Id.ToString().Replace("-", "_")));
+          runToken.Value = сommandLine;
+        }
+      }
+
+      if (nodes.Count() > 0)
+      {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"The *.bak file names in the test {Id}-{Name} have been patched!");
+        Console.ResetColor();
+      }
+    }
+
     protected void PatchDocTemplates(List<Tuple<string, string>> oldNewDbNames, PatchSession patchSession)
     {
 
