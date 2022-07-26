@@ -1,9 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Common.Model
 {
@@ -239,6 +235,10 @@ namespace Common.Model
         switch (extension)
         {
           case "scomp":
+            patchSession.PatchedFiles.Add(fileFullPath);
+            PatchCompFile(fileFullPath, oldNewDbNames);
+            PatchScompBackupFile(fileFullPath);
+            break;
           case "dcomp":
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchCompFile(fileFullPath, oldNewDbNames);
@@ -253,6 +253,7 @@ namespace Common.Model
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchSqlFile(fileFullPath, oldNewDbNames);
+            PatchSqlFileForBackups(fileFullPath);
             break;
           default:
             break;
@@ -290,6 +291,78 @@ namespace Common.Model
     private void PatchSqlFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
     {
       DBReplacer.TryToReplaceNamesInSQLFile(fileName, oldNewDbNames);
+    }
+
+    private void PatchSqlFileForBackups(string fileName)
+    {
+      // Здесь нам нужно добавлять айдишник теста к именам *.bak и просто.
+      // TO DISK = N'D:\Backup\2016XE\AutotestBackup_universal_source.bak'
+      // WITH NOFORMAT, INIT, NAME = N'AutotestBackup_universal_source', SKIP, NOREWIND, NOUNLOAD, STATS = 10, NO_COMPRESSION
+
+      string[]? fileLines = File.ReadAllLines(fileName);
+
+      bool backupWasPatched = false;
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        string filePattern = @"(\s*TO\s+DISK\s*)";
+        var fileMatch = Regex.Match(fileLines[i], filePattern);
+        if (fileMatch.Success)
+        {
+          var fileNames = RegexHelper.ExtractAnyFileNames(fileLines[i]);
+          if (fileNames.Length > 0 && fileNames[0].EndsWith(".bak"))
+          {
+            fileLines[i] = fileLines[i].Replace(fileNames[0], fileNames[0].Insert(fileNames[0].IndexOf(".bak"), "_" + Id.ToString().Replace("-", "_")));
+            backupWasPatched = true;
+          }
+        }
+
+        if (backupWasPatched)
+        {
+          string pattern = @"(?<=NAME\s*=\s*N')\w+(?=')";
+          var match = Regex.Match(fileLines[i], pattern);
+          if (match.Success)
+          {
+            fileLines[i] = fileLines[i].Replace(match.Value, match.Value + "_" + Id.ToString().Replace("-", "_"));
+          }
+        }
+
+      }
+
+      File.WriteAllLines(fileName, fileLines);
+    }
+
+    private void PatchScompBackupFile(string fileName)
+    {
+      // Здесь нам нужно добавлять адишник теста к именам *.bak.
+
+      string[]? fileLines = File.ReadAllLines(fileName);
+
+      // Find old db names, generate new names and replace where it occurs first time. 
+      for (int i = 0; i < fileLines.Length; i++)
+      {
+        // меняем в теге: <BackupName>AutotestBackup_universal_source</BackupName>
+        string pattern = @"(?<=<BackupName>)(.*)(?=\<\/BackupName>)";
+        var match = Regex.Match(fileLines[i], pattern);
+        if (match.Success)
+        {
+          fileLines[i] = fileLines[i].Replace(match.Value, match.Value + "_" + Id.ToString().Replace("-", "_"));
+        }
+
+        // меняем в теге <File Name="D:\Backup\2016XE\AutotestBackup_universal_source.bak" />
+        string filePattern = @"(<File\s+Name)";
+        var fileMatch = Regex.Match(fileLines[i], filePattern);
+        if (fileMatch.Success)
+        {
+          var fileNames = RegexHelper.ExtractAnyFileNames(fileLines[i]);
+          if (fileNames.Length > 0 && fileNames[0].EndsWith(".bak"))
+          {
+            fileLines[i] = fileLines[i].Replace(fileNames[0], fileNames[0].Insert(fileNames[0].IndexOf(".bak"), "_" + Id.ToString().Replace("-", "_")));
+          }
+        }
+      }
+
+      File.WriteAllLines(fileName, fileLines);
     }
   }
 }

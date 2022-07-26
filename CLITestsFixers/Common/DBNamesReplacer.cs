@@ -24,6 +24,7 @@ namespace Common
       , @"(?<=SET\s+IDENTITY_INSERT\s*)\[?\w+\]?"
       , @"(?<=\s*INSERT\s+INTO\s*)\[?\w+\]?"
       , @"(?<=\s*INSERT\s+)\[?\w+\]?"
+      , @"(?<=\s*BACKUP\s+DATABASE\s*)\[?\w+\]?"
       , @"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
 
     public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Guid preferedGuid = default)
