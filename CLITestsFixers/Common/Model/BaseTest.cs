@@ -316,7 +316,7 @@ namespace Common.Model
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
       }
-      File.WriteAllLines(fileName, fileLines);
+      RegexHelper.WriteAllLines(fileName, fileLines);
     }
 
     private void PatchSqlFile(string fileName, List<Tuple<string, string>> oldNewDbNames)
@@ -360,7 +360,7 @@ namespace Common.Model
 
       }
 
-      File.WriteAllLines(fileName, fileLines);
+      RegexHelper.WriteAllLines(fileName, fileLines);
     }
 
     private void PatchScompBackupFile(string fileName)
@@ -393,7 +393,7 @@ namespace Common.Model
         }
       }
 
-      File.WriteAllLines(fileName, fileLines);
+      RegexHelper.WriteAllLines(fileName, fileLines);
     }
   }
 }
