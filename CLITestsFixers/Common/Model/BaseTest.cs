@@ -147,6 +147,19 @@ namespace Common.Model
       }
     }
 
+    protected void PatchTimeout()
+    {
+      var timeOutNodes = JsonObject!.SelectTokens("..timeout", errorWhenNoMatch: false)!;
+      if (timeOutNodes != null)
+      {
+        foreach (var timeOutNode in timeOutNodes)
+        {
+          var timeOut = (JValue)timeOutNode;
+          timeOut.Value = 120000;
+        }
+      }
+    }
+
     protected void PatchServerName(List<Tuple<string, string>> oldNewDbNames)
     {
       var createDbNodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.

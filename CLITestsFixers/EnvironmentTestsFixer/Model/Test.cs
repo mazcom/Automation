@@ -23,6 +23,7 @@ namespace EnvironmentTestsFixer.Model
       PatchBackupName();
       PatchServerName(environment.OldNewDatabaseNames);
       PatchEnterprise();
+      PatchTimeout();
 
       // Patch the attached separate files(scomp, dcomp, dgen, etalon.sql and etc.) to a test.
       PatchDocTemplates(environment.OldNewDatabaseNames, patchSession);

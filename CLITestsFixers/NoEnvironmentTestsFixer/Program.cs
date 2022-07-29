@@ -194,6 +194,7 @@ foreach (var testFile in files)
         test.Patch(oldNewNames, patchSession);
       }
     }
+    test.Patch();
   }
   // Переписываем файл _definition.tests с тестами с уже исправленными именами файлов.
   File.WriteAllText(currentTestFileName, jsonObjects.ToString());

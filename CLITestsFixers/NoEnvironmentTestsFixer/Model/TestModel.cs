@@ -25,10 +25,15 @@ namespace NoEnvironmentTestsFixer.Model
       // Path a test info.
       PatchDatabaseNames(oldNewDbNames);
       PatchServerName(oldNewDbNames);
-      PatchEnterprise();
 
       // Patch the attached separate files(scomp, dcomp, dgen, etalon.sql and etc.) to a test.
       PatchDocTemplates(oldNewDbNames, patchSession);
+    }
+
+    public void Patch()
+    {
+      PatchTimeout();
+      PatchEnterprise();
     }
 
     public void AddCleanSection(string createFileName, List<Tuple<string, string>> oldNewDbNames)
@@ -112,7 +117,8 @@ GO
 
       // СОЗДАНИЕ БАЗЫ ДАННЫХ.
       foreach (var token in this.JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase) 
+         && !((string)t!).Contains("output.sql", StringComparison.OrdinalIgnoreCase))!)
       {
         var createDbCommandLine = (string)token!;
         // Получаем имя базы данных из теста like Databases.sql
@@ -124,7 +130,8 @@ GO
 
       // УДАЛЕНИЕ БАЗЫ ДАННЫХ.
       foreach (var token in this.JsonObject.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!.
-        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!)
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase)
+        && !((string)t!).Contains("output.sql", StringComparison.OrdinalIgnoreCase))!)
       {
         var cleanDbCommandLine = (string)token!;
         // Получаем имя базы данных из теста like CleanUp.sql
