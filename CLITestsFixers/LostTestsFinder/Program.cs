@@ -4,12 +4,12 @@ using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\SqlServer\Studio\");
-//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\";
-string pathToTests = Console.ReadLine()!;
+string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\";
+//string pathToTests = Console.ReadLine()!;
 
 Console.WriteLine(@"Please, enter a path to the test plans like D:\Projects\commandlinetests\TestPlans\SqlServer\");
-//string pathToTestPlans = @"D:\Projects\commandlinetestsMR2\TestPlans\SqlServer\";
-string pathToTestPlans = Console.ReadLine()!;
+string pathToTestPlans = @"D:\Projects\commandlinetestsMR2\TestPlans\SqlServer\";
+//string pathToTestPlans = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {
@@ -72,8 +72,8 @@ foreach (var testPlanFile in testPlanFiles)
 Console.WriteLine();
 
 // Находим тесты, которые забыли добавить в какой-либо тест план.
-var testsNotAddedToAnyTestPlan = allTests.Except(testsInTestPlans);
-if (!testsNotAddedToAnyTestPlan.Any())
+var testsNotAddedToAnyTestPlan = allTests.Except(testsInTestPlans).ToList();
+if (testsNotAddedToAnyTestPlan.Count == 0)
 {
   Console.ForegroundColor = ConsoleColor.Green;
   Console.WriteLine($"Все тесты из папки {pathToTests} присутствуют в тест-планах!!!");
@@ -94,8 +94,8 @@ else
 Console.WriteLine();
 
 // Находим тесты, которые существуют в тест-планах но существуют в папке с тестами.
-var testsExistsOnlyInTestPlans = testsInTestPlans.Except(allTests);
-if (!testsExistsOnlyInTestPlans.Any())
+var testsExistsOnlyInTestPlans = testsInTestPlans.Except(allTests).ToList();
+if (testsExistsOnlyInTestPlans.Count == 0)
 {
   Console.ForegroundColor = ConsoleColor.Green;
   Console.WriteLine($"Все тесты из тест-планов существуют в тестах!!!");
@@ -119,4 +119,3 @@ Console.WriteLine($"Total tests in the _definition.tests files count = {allTests
 Console.WriteLine($"Total tests in the *.testplan files count = {testsInTestPlans.Count}");
 Console.WriteLine($"Completed!");
 Console.ResetColor();
-Console.ReadKey();
