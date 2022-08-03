@@ -83,7 +83,7 @@ else
 {
   Console.ForegroundColor = ConsoleColor.Yellow;
   Console.WriteLine($@"Следующие тесты из папки ""{pathToTests}"" отсутствуют в каком-либо тест-плане:");
-  Console.WriteLine($@"Общее количество таких тестов: ""{testsNotAddedToAnyTestPlan.Count()}""");
+  Console.WriteLine($@"Общее количество таких тестов: ""{testsNotAddedToAnyTestPlan.Count}""");
   foreach (var testId in testsNotAddedToAnyTestPlan)
   {
     Console.WriteLine($"Тест: {testId} ");
@@ -105,7 +105,7 @@ else
 {
   Console.ForegroundColor = ConsoleColor.Yellow;
   Console.WriteLine($@"Следующие тесты из тест-планов отсутствуют в тестах в папке ""{pathToTests}"" ");
-  Console.WriteLine($@"Общее количество таких тестов: {testsExistsOnlyInTestPlans.Count()}");
+  Console.WriteLine($@"Общее количество таких тестов: {testsExistsOnlyInTestPlans.Count}");
   foreach (var testId in testsExistsOnlyInTestPlans)
   {
     Console.WriteLine($"Тест: {testId} ");
