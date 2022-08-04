@@ -39,6 +39,8 @@ string[] testPlanFiles = Directory.GetFiles(pathToTestPlans,
 HashSet<Guid> allTests = new();
 HashSet<Guid> testsInTestPlans = new();
 
+Dictionary<Guid, string> pathsToTheLostTests = new();
+
 // Retrieve all tests id.
 foreach (var testFile in testFiles)
 {
@@ -49,7 +51,12 @@ foreach (var testFile in testFiles)
     JArray jsonObjects = JArray.Parse(json);
     foreach (JObject jsonObject in jsonObjects)
     {
-      allTests.Add((Guid)jsonObject.SelectToken("id")!);
+      var id = (Guid)jsonObject.SelectToken("id")!;
+      allTests.Add(id);
+      if (!pathsToTheLostTests.ContainsKey(id))
+      {
+        pathsToTheLostTests.Add(id, testFile);
+      }
     }
   }
 }
@@ -86,7 +93,8 @@ else
   Console.WriteLine($@"Общее количество таких тестов: ""{testsNotAddedToAnyTestPlan.Count}""");
   foreach (var testId in testsNotAddedToAnyTestPlan)
   {
-    Console.WriteLine($"Тест: {testId} ");
+    pathsToTheLostTests.TryGetValue(testId, out var path);
+    Console.WriteLine($"Тест: {testId}. Path: {Path.GetDirectoryName(path)} ");
   }
   Console.ResetColor();
 }
