@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LostTestsFinder", "LostTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnterpriseFixer", "EnterpriseFixer\EnterpriseFixer.csproj", "{CF237BF4-600E-471A-8E69-186D2EE9E90F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeoutFixer", "TimeoutFixer\TimeoutFixer.csproj", "{FD1F84DE-E8BE-4B84-8991-5A53201300B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{CF237BF4-600E-471A-8E69-186D2EE9E90F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF237BF4-600E-471A-8E69-186D2EE9E90F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF237BF4-600E-471A-8E69-186D2EE9E90F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD1F84DE-E8BE-4B84-8991-5A53201300B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD1F84DE-E8BE-4B84-8991-5A53201300B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD1F84DE-E8BE-4B84-8991-5A53201300B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD1F84DE-E8BE-4B84-8991-5A53201300B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
