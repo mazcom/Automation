@@ -49,6 +49,15 @@ namespace EnvironmentTestsFixer.Model
         var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
         var sqlFileName = RegexHelper.ExtractSqlFileNameFromCommandLine(createDbCommandLine)!;
 
+        if (string.IsNullOrEmpty(sqlFileName))
+        {
+          Console.ForegroundColor = ConsoleColor.Yellow;
+          Console.WriteLine($"Attention! Could not parce a file file name from command {createDbCommandLine}!");
+          Console.ResetColor();
+          continue;
+        }
+
+
         if (!sqlFileNames.Contains(sqlFileName))
         {
           sqlFileNames.Add(sqlFileName);
