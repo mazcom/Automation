@@ -1,11 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\SqlServer\Studio\");
-//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\";
-string pathToTests = Console.ReadLine()!;
+string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\";
+//string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {
@@ -19,7 +20,7 @@ string[] testFiles = Directory.GetFiles(pathToTests,
             "_definition.tests",
             SearchOption.AllDirectories);
 
-HashSet<string> allIssues = new();
+Dictionary<string, int> allIssues = new();
 
 // Retrieve all tests id.
 foreach (var testFile in testFiles)
@@ -34,9 +35,13 @@ foreach (var testFile in testFiles)
       var issue = (string)jsonObject.SelectToken("issue")!;
       if (!string.IsNullOrEmpty(issue))
       {
-        if (!allIssues.Contains(issue))
+        if (!allIssues.ContainsKey(issue))
         {
-          allIssues.Add(issue);
+          allIssues.Add(issue, 1);
+        }
+        else
+        {
+          allIssues[issue] += 1;
         }
       }
     }
@@ -44,11 +49,11 @@ foreach (var testFile in testFiles)
 }
 
 Console.WriteLine("Issues:");
-var sorted = allIssues.ToList<string>();
+var sorted = allIssues.Keys.ToList();
 sorted.Sort();
 foreach (var issue in sorted)
 {
-  Console.WriteLine(issue);
+  Console.WriteLine($"{issue}. Occurrence: {allIssues[issue]}");
 }
 
 Console.WriteLine();
