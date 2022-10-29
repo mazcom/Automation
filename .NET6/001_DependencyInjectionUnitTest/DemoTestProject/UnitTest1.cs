@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace DemoTestProject
 {
   [TestClass]
@@ -8,7 +10,7 @@ namespace DemoTestProject
     [TestCategory("ProductCategory")]
     public void TestMethod1()
     {
-
+      Console.WriteLine("Console write text");
     }
   }
 }
