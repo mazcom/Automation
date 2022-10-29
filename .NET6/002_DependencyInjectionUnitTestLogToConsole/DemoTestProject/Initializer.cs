@@ -27,21 +27,12 @@ namespace DemoTestProject
       var builder = Host.CreateDefaultBuilder();
       builder.ConfigureServices((_, services) =>
         services.AddTransient<IFeaturesManager, FeaturesManager>()
-        //.AddLogging(config => config.AddConsole())
       );
 
       builder.UseSerilog();
 
-      //builder.ConfigureLogging(logging =>
-      //{
-      //  logging.ClearProviders();
-      //  logging.AddConsole();
-      //});
-
       var host =  builder.Build();
       Manager.Host = host;
-
-
     }
   }
 }
