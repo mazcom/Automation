@@ -22,6 +22,7 @@ namespace DemoTestProject
       var logger = new LoggerConfiguration()
         .MinimumLevel.Debug()
         .WriteTo.File("aaaaaabbbb.log", rollingInterval: RollingInterval.Infinite)
+        //.WriteTo.Console() // можно писать одновременно и в файл и в консоль.
         .CreateLogger();
 
 
