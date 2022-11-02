@@ -49,11 +49,10 @@ foreach (var testFile in testFiles)
 }
 
 Console.WriteLine("Issues:");
-var sorted = allIssues.Keys.ToList();
-sorted.Sort();
+var sorted = allIssues.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 foreach (var issue in sorted)
 {
-  Console.WriteLine($"{issue}. Occurrence: {allIssues[issue]}");
+  Console.WriteLine($"{issue.Key}. Occurrence: {issue.Value}");
 }
 
 Console.WriteLine();
