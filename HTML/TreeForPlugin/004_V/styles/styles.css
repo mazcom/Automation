@@ -1,0 +1,184 @@
+h1 {
+    display: inline;
+    font-size: small;
+    margin: 0;
+    padding: 0 10px;
+}
+
+h2 {
+    display: inline;
+    font-size: small;
+    margin: 0;
+    padding: 0 10px;
+}
+
+.tree {
+    --spacing: 1.5rem;
+    --radius: 25px;
+    white-space: nowrap;
+    margin: 4;
+    padding: 4;
+    list-style-type: none;
+    min-width: max-content;
+    max-width: fit-content;
+}
+
+.tree li {
+    /*removes the bullet points from list items*/
+    display: block;
+    position: relative;
+    padding-left: calc(2 * var(--spacing) - var(--radius) - 10px);
+}
+
+span.file {
+    content: "";
+}
+
+span.file::before {
+    content: "";
+}
+
+span.file {
+    vertical-align: text-top;
+    padding-left: 5px;
+}
+
+.fileNode {
+    display: inline-block;
+    content: url("../images/html5.svg");
+    width: 16px;
+    height: 16px;
+}
+
+.tree li.item {
+    cursor: pointer;
+    white-space: nowrap;
+    list-style-type: none;
+}
+
+.tree li.item:hover {
+    text-shadow: 0 0 0.05px black;
+}
+
+.tree li.item:hover i {
+    font-weight: normal;
+}
+
+.tree li.selected {
+    font-weight: bold;
+    cursor: default;
+}
+
+.tree li.selected i {
+    font-weight: normal;
+    cursor: default;
+}
+
+.tree ul {
+    margin-left: calc(var(--radius) - var(--spacing));
+    padding-left: 10;
+    padding-top: 9;
+    width: fit-content;
+}
+
+
+/* Vertical lines */
+.tree ul li {
+    border-left: 1px solid #ddd;
+}
+
+.tree ul li:last-child {
+    border-color: transparent;
+}
+
+/* Horizontal lines */
+.tree ul li::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: calc(var(--spacing) / -2);
+    left: -1px;
+    /* width: calc(var(--spacing)); */
+    width: 14px;
+    height: calc(var(--spacing) - 6px);
+    border: solid #ddd;
+    border-width: 0 0 1px 1px;
+}
+
+.caret {
+    cursor: pointer;
+    -webkit-user-select: none;
+    /* Safari 3.1+ */
+    -moz-user-select: none;
+    /* Firefox 2+ */
+    -ms-user-select: none;
+    /* IE 10+ */
+    user-select: none;
+
+}
+
+.caret::before {
+    content: url("../images/folderClosed.svg");
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.caret-down::before {
+    /* -ms-transform: rotate(90deg); */
+    /* IE 9 */
+    /* -webkit-transform: rotate(90deg); */
+    /* Safari */
+    /* transform: rotate(90deg); */
+    /* content: "\1F4C2"; */
+
+    content: url("../images/folderOpen.svg");
+    width: 16px;
+    height: 16px;
+}
+
+.nested {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+/* ---  */
+.container {
+    display: flex;
+
+    /* Misc */
+    border: 1px solid #cbd5e0;
+    height: 100%;
+    width: 100%;
+}
+
+.container__left {
+    overflow-x: auto;
+    overflow-y: auto;
+    flex-direction: column;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: left;
+    width: 25%;
+}
+
+.resizer {
+    background-color: #cbd5e0;
+    cursor: ew-resize;
+    height: 100%;
+    width: 8px;
+}
+
+.container__right {
+    /* Take the remaining width */
+    flex: 1;
+
+    /* Misc */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}

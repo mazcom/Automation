@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,11 @@ namespace DemoTestProject
     [AssemblyInitialize]
     public static void Initialize(TestContext testContext)
     {
+      var args = Environment.GetCommandLineArgs();
+
+      
+
+
       // https://github.com/serilog/serilog-settings-configuration
 
       var configuration = new ConfigurationBuilder()
@@ -31,9 +37,12 @@ namespace DemoTestProject
         .ConfigureAppConfiguration(config =>
         {
           config.AddConfiguration(configuration);
+          //config.AddCommandLine(args);
         })
         .ConfigureServices((_, services) =>
-        services.AddTransient<IFeaturesManager, FeaturesManager>()
+        services
+        .AddTransient<IFeaturesManager, FeaturesManager>()
+        .AddTransient<ICalculationService, CalculationService>()
       );
 
       var logger = new LoggerConfiguration()
@@ -45,6 +54,12 @@ namespace DemoTestProject
       var host = builder.Build();
 
       Manager.Host = host;
+
+      //foreach (var item in args)
+      //{
+      //  Manager.Host.Services.GetRequiredService<ILogger<Program>>().LogDebug($"arg: {item}");
+      //  //Console.WriteLine($"arg: {item}");
+      //}
     }
   }
 }

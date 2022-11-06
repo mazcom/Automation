@@ -1,0 +1,133 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>HTML DOM - Create resizable split views</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" type="text/css" href="styles/styles.css">
+    <script src="scripts/splitter.js"></script>
+    <script src="scripts/tree.js"></script>    
+</head>
+
+<body>
+    <div class="container">
+        <div class="container__left">
+            <div>
+                <h1><a id="hudson_link" href="#"></a></h1>
+                <h2><a id="zip_link" href="#">Zip</a></h2>
+            </div>
+            <ul class="tree">
+                <li><span class="caret">cmdTests</span>
+                    <ul class="nested">
+                        <li><span class="caret">Tests</span>
+                            <ul class="nested">
+                                <li><span class="caret">SqlServer</span>
+                                    <ul class="nested">
+                                        <li><span class="caret">Studio</span>
+                                            <ul class="nested">
+                                                <li><span class="caret">SchemaComparer</span>
+                                                    <ul class="nested">
+                                                        <li><span class="caret">Command_Line</span>
+                                                            <ul class="nested">
+                                                                <li><span class="caret">IgnoreWithOptionOrder</span>
+                                                                    <ul class="nested">
+                                                                        <li id="test1" class="item"
+                                                                            value="Diffs/Diff1.html"
+                                                                            onclick="updateBody('test1');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">Ignore_WITH_OPTION_ORDER_OFF(command_line)-Diff.html</span>
+                                                                        </li>
+                                                                        <li id="test2" class="item"
+                                                                            value="Diffs/Diff2.html"
+                                                                            onclick="updateBody('test2');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">Ignore_WITHOUT_OPTION_SORT_ON-Diff.html</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><span class="caret">Help</span>
+                                                            <ul class="nested">
+                                                                <li><span class="caret">TestExecute</span>
+                                                                    <ul class="nested">
+                                                                        <li id="test3" class="item"
+                                                                            value="Diffs/Diff3.html"
+                                                                            onclick="updateBody('test3');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">Execute1-Diff.html</span>
+                                                                        </li>
+                                                                        <li id="test4" class="item"
+                                                                            value="Diffs/Diff4.html"
+                                                                            onclick="updateBody('test4');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">Execute2-Diff.html</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                                <li><span class="caret">TestGenerator</span>
+                                                                    <ul class="nested">
+                                                                        <li id="test5" class="item"
+                                                                            value="Diffs/Diff5.html"
+                                                                            onclick="updateBody('test5');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">CityData-Diff.html</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+
+                                                <li><span class="caret">DataComparer</span>
+                                                    <ul class="nested">
+                                                        <li><span class="caret">Command_Line</span>
+                                                            <ul class="nested">
+                                                                <li><span class="caret">Collations</span>
+                                                                    <ul class="nested">
+                                                                        <li id="test6" class="item"
+                                                                            value="Diffs/Diff6.html"
+                                                                            onclick="updateBody('test6');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">SQL_Collations-Diff.html</span>
+                                                                        </li>
+                                                                        <li id="test7" class="item"
+                                                                            value="Diffs/Diff7.html"
+                                                                            onclick="updateBody('test7');">
+                                                                            <img class="fileNode"><span
+                                                                                class="file">Win_Collations.html</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <script
+                    type="text/javascript">document.getElementById("hudson_link").innerHTML = "Back to CliTest";</script>
+                <script
+                    type="text/javascript">document.getElementById("hudson_link").href = "http://jenkins-dbforge.datasoft.local:8080/job/Automation/job/CliTest/";</script>
+                <script
+                    type="text/javascript">document.getElementById("zip_link").href = "*zip*/HTMLReports.zip";</script>
+            </ul>
+        </div>
+
+
+        <div class="resizer" id="dragMe"></div>
+        <div class="container__right">
+            <iframe id="myframe" height="100%" width="100%" frameborder="0" src="div-2.html"></iframe>
+        </div>
+    </div>
+</body>
+
+</html>
