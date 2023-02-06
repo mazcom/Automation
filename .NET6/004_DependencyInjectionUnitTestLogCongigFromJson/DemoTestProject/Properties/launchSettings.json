@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DemoTestProject": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "Edition": "myedition",
+        "ASPNETCORE_ENVIRONMENT": "myval"
+      }
+    }
+  }
+}

@@ -23,20 +23,25 @@ namespace DemoTestProject
     {
       var args = Environment.GetCommandLineArgs();
 
-      
-
-
       // https://github.com/serilog/serilog-settings-configuration
 
       var configuration = new ConfigurationBuilder()
        .AddJsonFile("appsettings.json")
+       //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+       .AddEnvironmentVariables()
        .Build();
 
       var builder = Host.CreateDefaultBuilder();
       builder
-        .ConfigureAppConfiguration(config =>
+        .ConfigureAppConfiguration((hostingContext, config) =>
         {
+          // Environments.Development
+          // Environments.Staging
+          // Environments.Production
+
+          IHostEnvironment env = hostingContext.HostingEnvironment;
           config.AddConfiguration(configuration);
+          config.AddJsonFile($"appsettings.Pro.json", true, true);
           //config.AddCommandLine(args);
         })
         .ConfigureServices((_, services) =>

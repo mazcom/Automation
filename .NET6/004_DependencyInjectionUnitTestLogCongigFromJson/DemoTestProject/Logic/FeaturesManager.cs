@@ -7,7 +7,8 @@ namespace DemoTestProject.Logic
   {
     public FeaturesManager(IConfiguration configuration)
     {
-
+      Console.WriteLine($"Edition: {configuration["Edition"]}");
+      Console.WriteLine($"V1: {configuration["V1"]}");
     }
 
     public bool IsEnabled(string featureName)

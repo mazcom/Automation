@@ -1,17 +1,20 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.Diagnostics;
-
-Console.WriteLine("Hello, World!");
+using System.Text;
 
 
-using var process = new Process();
+Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-process.StartInfo.FileName = @"C:\Program Files\Devart\dbForge Studio for SQL Server\dbforgesql.com";
-process.StartInfo.Arguments = @" /? >Help_file.txt";
-process.StartInfo.WorkingDirectory = @"c:\Tests\SqlServer\Studio\Help\";
-// Tests\SqlServer\Studio\SchemaComparer\Options\Comparison\IgnoreCache
-process.Start();
+var DefaultEncoding = Encoding.GetEncoding("windows-1251");
 
+using StreamReader streamReader = new StreamReader("c:\\utf8.sql", DefaultEncoding, true, 1024 * 1024);
+
+
+
+
+var s = streamReader.ReadToEnd();
 
 Console.ReadKey();
+
+
+
 
