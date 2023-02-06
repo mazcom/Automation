@@ -69,8 +69,8 @@ foreach (var environmentFile in environmentFiles)
 
       var nodes = jsonObject!.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
         Where(t => 
-              ((string)t!).Contains("SourceObjects.sql", StringComparison.OrdinalIgnoreCase)
-              || ((string)t!).Contains("TargetObjects.sql", StringComparison.OrdinalIgnoreCase)
+              ((string)t!).Contains("SourceObjects", StringComparison.OrdinalIgnoreCase)
+              || ((string)t!).Contains("TargetObjects", StringComparison.OrdinalIgnoreCase)
               || ((string)t!).Contains("Source.sql", StringComparison.OrdinalIgnoreCase)
               || ((string)t!).Contains("Target.sql", StringComparison.OrdinalIgnoreCase))!.ToList();
 
@@ -176,70 +176,61 @@ $@"{{
 
       newJsonObjects.Add(JObject.Parse(jsonString));
 
+      //
+      // Create _cleanUp.sql file
+      //
+      string cleanUpFileNameText =
+$@"SELECT
+	pg_terminate_backend(pid),
+	pg_cancel_backend(pid)
+FROM
+	pg_stat_activity
+WHERE
+	pid<>pg_backend_pid() AND
+	datname IN ('{dbName1}', '{dbName1}');
+
+DROP DATABASE IF EXISTS {dbName1};
+DROP DATABASE IF EXISTS {dbName2};
+";
+
+      string cleanUpFileNameFillPath = Path.Combine(newPathToEnvironments, cleanUpFileName);
+      File.WriteAllText(cleanUpFileNameFillPath, cleanUpFileNameText);
+
+      //
+      // Create _create.sql file
+      //
+      string createFileNameText =
+$@"CREATE DATABASE {dbName1};
+CREATE DATABASE {dbName2};
+";
+
+      string createFileNameFillPath = Path.Combine(newPathToEnvironments, createFileName);
+      File.WriteAllText(createFileNameFillPath, createFileNameText);
+
+
+      string newCreateObjectsFile1 = Path.Combine(newPathToEnvironments, newSourceFileName);
+      string newCreateObjectsFile2 = Path.Combine(newPathToEnvironments, newTargetFileName);
+
       // Copy old Create DB objects fileName1
       if (!string.IsNullOrEmpty(oldCreateDBObjectsSqlFileName1) && !string.IsNullOrEmpty(oldCreateDBObjectsSqlFileName2))
       {
         string oldDir = Path.GetDirectoryName(environmentFile);
 
         string oldFile1 = Path.Combine(oldDir, oldCreateDBObjectsSqlFileName1);
-        string newFile1 = Path.Combine(newPathToEnvironments, newSourceFileName);
-        File.Copy(oldFile1, newFile1, overwrite: true);
+        File.Copy(oldFile1, newCreateObjectsFile1, overwrite: true);
 
         string oldFile2 = Path.Combine(oldDir, oldCreateDBObjectsSqlFileName2);
-        string newFile2 = Path.Combine(newPathToEnvironments, newTargetFileName);
-        File.Copy(oldFile2, newFile2, overwrite: true);
+        File.Copy(oldFile2, newCreateObjectsFile2, overwrite: true);
       }
-
-
-      // Copy old Create DB objects fileName2
-
-
-
-      //foreach (var commandLine in jsonObject!.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
-      //  Where(t => ((string)t!).Contains("TargetDB.sql", StringComparison.OrdinalIgnoreCase)).ToList())
-      //{
-      //  var sqlFileName = RegexHelper.ExtractSqlFileNameFromCommandLine((string)commandLine!);
-
-      //  Debug.WriteLine("hello");
-      //  //var createDbCommandLine = (string)token!;
-      //  //// Получаем имя базы данных из теста like Databases.sql
-      //  //var createDbFileName = FilesHelper.ExtractFileName(createDbCommandLine)!;
-      //  //// Полный путь к файлу создания базы данных.
-      //  //string initDbFullFileName = Path.Combine(currentDir, createDbFileName);
-      //  //CreateDbFiles.Add(new FileModel() { FullPath = initDbFullFileName, FileName = createDbFileName });
-      //}
+      else
+      {
+        File.WriteAllText(newCreateObjectsFile1, "!!!Could not find a source file name. Please do it yourself! ");
+        File.WriteAllText(newCreateObjectsFile2, "!!!Could not find a source file name. Please do it yourself! ");
+      }
     }
   }
 }
 
-
-//Dictionary<string, int> allIssues = new();
-
-// Retrieve all tests id.
-//foreach (var testFile in testFiles)
-//{
-//  //JArray jsonObjects;
-//  using (StreamReader sr = new(testFile))
-//  {
-//    string json = sr.ReadToEnd();
-//    JArray jsonObjects = JArray.Parse(json);
-//    foreach (JObject jsonObject in jsonObjects)
-//    {
-//      var issue = (string)jsonObject.SelectToken("issue")!;
-//      if (!string.IsNullOrEmpty(issue))
-//      {
-//        if (!allIssues.ContainsKey(issue))
-//        {
-//          allIssues.Add(issue, 1);
-//        }
-//        else
-//        {
-//          allIssues[issue] += 1;
-//        }
-//      }
-//    }
-//  }
-//}
 
 //Console.WriteLine("Issues:");
 //var sorted = allIssues.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
