@@ -81,7 +81,7 @@ namespace Common.Model
             {
               addenterpriseSection =
               $@"{{
-""condition"": ""Enterprise"",
+""condition"": ""Enterprise, Professional"",
 ""etalon"": {{
   ""standard_output"": ""{etalonNode!.SelectTokens("standard_output", errorWhenNoMatch: false)!.FirstOrDefault().Value<string>().Replace(@"\", @"\\")}""
 }}
@@ -93,7 +93,7 @@ namespace Common.Model
             {
               addenterpriseSection =
               $@"{{
-""condition"": ""Enterprise"",
+""condition"": ""Enterprise, Professional"",
 ""etalon"": ""{etalonNode!.Value<string>().Replace(@"\", @"\\")}"",
 ""actual"": ""{actualNode!.Value<string>().Replace(@"\", @"\\")}""    
 }}";
@@ -297,7 +297,7 @@ namespace Common.Model
           case "sql":
             patchSession.PatchedFiles.Add(fileFullPath);
             PatchSqlFile(fileFullPath, oldNewDbNames);
-            PatchSqlFileForBackups(fileFullPath);
+            //PatchSqlFileForBackups(fileFullPath);
             break;
           default:
             break;

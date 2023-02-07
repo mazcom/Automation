@@ -12,9 +12,11 @@ using System.Text.Json.Nodes;
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the environments like D:\Projects\commandlinetestsMaster2\Environments\PostgreSQL\Studio\SchemaComparer\");
 string pathToEnvironments = @"D:\Projects\commandlinetestsMaster2\Environments\PostgreSQL\Studio\SchemaComparer\";
+//string pathToEnvironments = @"D:\Projects\commandlinetestsMaster2\Environments\PostgreSQL\Studio\DataComparer\";
 //string pathToTests = Console.ReadLine()!;
 
 var newPathToEnvironments = Path.GetFullPath(Path.Combine(pathToEnvironments, @"..\_SchemaComparer"));
+//var newPathToEnvironments = Path.GetFullPath(Path.Combine(pathToEnvironments, @"..\_DataComparer"));
 
 if (!Directory.Exists(pathToEnvironments))
 {
@@ -27,7 +29,7 @@ if (!Directory.Exists(pathToEnvironments))
 JArray newJsonObjects = new JArray();
 
 string[] environmentFiles = Directory.GetFiles(pathToEnvironments,
-            "*.environments",
+            "*.environments*",
             SearchOption.AllDirectories);
 int count = 0;
 int notFoundcount = 0;
@@ -187,7 +189,7 @@ FROM
 	pg_stat_activity
 WHERE
 	pid<>pg_backend_pid() AND
-	datname IN ('{dbName1}', '{dbName1}');
+	datname IN ('{dbName1}', '{dbName2}');
 
 DROP DATABASE IF EXISTS {dbName1};
 DROP DATABASE IF EXISTS {dbName2};
@@ -225,7 +227,7 @@ CREATE DATABASE {dbName2};
       else
       {
         File.WriteAllText(newCreateObjectsFile1, "!!!Could not find a source file name. Please do it yourself! ");
-        File.WriteAllText(newCreateObjectsFile2, "!!!Could not find a source file name. Please do it yourself! ");
+        File.WriteAllText(newCreateObjectsFile2, "!!!Could not find a target file name. Please do it yourself! ");
       }
     }
   }
@@ -245,7 +247,8 @@ if (!Directory.Exists(newPathToEnvironments))
   Directory.CreateDirectory(newPathToEnvironments);
 }
 
-var newEnvironmentFileName = Path.Combine(newPathToEnvironments, "_PostgreSqlSchemaComparer.environments");
+//var newEnvironmentFileName = Path.Combine(newPathToEnvironments, "_PostgreSqlSchemaComparer.environments");
+var newEnvironmentFileName = Path.Combine(newPathToEnvironments, "_PostgreDataComparer.environments");
 File.WriteAllText(newEnvironmentFileName, newJsonObjects.ToString());
 
 
