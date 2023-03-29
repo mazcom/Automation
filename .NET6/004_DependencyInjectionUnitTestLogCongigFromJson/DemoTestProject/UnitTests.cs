@@ -11,6 +11,7 @@ namespace DemoTestProject
   [TestClass]
   public class UnitTests
   {
+
     [TestMethod]
     [TestCategory("SQLCategory")]
     [TestCategory("OracleCategory")]
@@ -18,21 +19,20 @@ namespace DemoTestProject
     public void TestMethod1()
     {
       Console.WriteLine("hello from UnitTest1.TestMethod1()");
-      Do();
     }
 
-    protected virtual void Do()
+    [TestMethod]
+    [TestCategory("Common")]
+    public void TestMethod2()
     {
-
+      Console.WriteLine("hello from UnitTest1.TestMethod2()");
     }
-  }
 
-  [TestClass]
-  public class DerivedUnitTests : UnitTests
-  {
-    protected override void Do()
+    [TestMethod]
+    [TestCategory("PgCategory")]
+    public void TestMethod3()
     {
-
+      Console.WriteLine("hello from UnitTest1.TestMethod3()");
     }
   }
 }
