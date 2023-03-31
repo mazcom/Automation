@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ProducerConsumerConsoleApp;
 using ProducerConsumerConsoleApp.Models;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 Console.WriteLine("Hello, World!");
@@ -34,9 +35,9 @@ var environmets = new List<EnvironmentModel>()
 //  FullMode = BoundedChannelFullMode.Wait
 //});
 
-int messageLimit = 3;
+int messageLimit = 1;
 
-var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(messageLimit)
+var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(messageLimit * 2)
 {
   FullMode = BoundedChannelFullMode.Wait
 });
@@ -62,25 +63,49 @@ _ = Task.Factory.StartNew(async () => await producer.ProduceWorkAsync());
 //});
 
 
+var translateDocumentTasks = Enumerable
+        .Range(0, messageLimit) // 7 translation tasks
+        .Select(_ => Task.Run(async () =>
+        {
+          while (await channel.Reader.WaitToReadAsync())
+          {
+            while (channel.Reader.TryRead(out var data))
+            {
+              //data.Run();
 
-Task[] consumers = new Task[messageLimit];
-for (int i = 0; i < consumers.Length; i++)
-{
-  consumers[i] = Task.Factory.StartNew(async () =>
-  {
-    while (await channel.Reader.WaitToReadAsync())
-    {
-      if (channel.Reader.TryRead(out
-              var data))
-      {
-        data.Run();
-        //Console.WriteLine($" Data read from Consumer No.{Task.CurrentId} is {data}");
-      }
-    }
-  });
-}
+              Console.WriteLine($"Start runnning: {data}");
+              data.Run();
+              //Random.Shared.Next(1000, 4000)
+              await Task.Delay(3000);
+              Console.WriteLine($"Completing runnning: {data}");
+              
+              //var document = await ReadAndTranslateDocument(documentId);
+              //await savingChannel.Writer.WriteAsync(document);
+            }
+          }
+        }))
+        .ToArray();
 
-Task.WaitAll(consumers);
+await Task.WhenAll(translateDocumentTasks);
+
+//Task[] consumers = new Task[messageLimit];
+//for (int i = 0; i < consumers.Length; i++)
+//{
+//  consumers[i] = Task.Factory.StartNew(async () =>
+//  {
+//    while (await channel.Reader.WaitToReadAsync())
+//    {
+//      if (channel.Reader.TryRead(out
+//              var data))
+//      {
+//        data.Run();
+//        //Console.WriteLine($" Data read from Consumer No.{Task.CurrentId} is {data}");
+//      }
+//    }
+//  });
+//}
+
+//Task.WaitAll(consumers);
 
 Console.ReadKey();
 //producer.Wait();

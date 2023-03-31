@@ -16,9 +16,16 @@ namespace ProducerConsumerConsoleApp.Models
     public string Name { get; set; }
     public IEnumerable<IRunnable> Children => Enumerable.Empty<IRunnable>();
 
+    public override string ToString() => Name;
+
     public void Run()
     {
-      Console.WriteLine($"Runnable with Name {Name} was run");
+      //Console.WriteLine($"Start runnning: {data}");
+      //Thread.Sleep(3000);
+      ////await Task.Delay(3000);
+      //Console.WriteLine($"Completing runnning: {data}");
+
+      //Console.WriteLine($"Runnable with Name {Name} was run");
     }
   }
 }

@@ -30,8 +30,8 @@ namespace ProducerConsumerConsoleApp
       foreach (var todo in runnables)
       {
         await _channelWriter.WriteAsync(todo);
-        Console.WriteLine($"Added todo: '{todo}' to channel");
-        await Task.Delay(500);
+        //Console.WriteLine($"Added todo: '{todo}' to channel");
+        //await Task.Delay(500);
       }
       _channelWriter.Complete();
     }

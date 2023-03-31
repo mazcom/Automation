@@ -19,9 +19,10 @@ namespace ProducerConsumerConsoleApp
     {
       await foreach (var todo in _channelReader.ReadAllAsync())
       {
+        Console.WriteLine($"Start runnning: {todo}");
         todo.Run();
-        Console.WriteLine($"Completing todo: {todo}");
         await Task.Delay(1000);
+        Console.WriteLine($"Completing runnning: {todo}");
       }
 
       Console.WriteLine("All items read");

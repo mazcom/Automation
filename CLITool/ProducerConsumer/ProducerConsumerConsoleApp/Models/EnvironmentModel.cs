@@ -22,6 +22,9 @@ namespace ProducerConsumerConsoleApp.Models
       set;
     }
 
+    public override string ToString() => Name;
+    
+
     public IEnumerable<IRunnable> Children
     {
       get
@@ -39,7 +42,7 @@ namespace ProducerConsumerConsoleApp.Models
 
     public void Run()
     {
-      Console.WriteLine($"Runnable with Name {Name} was run");
+      //Console.WriteLine($"Runnable with Name {Name} was run");
       Status = EnvironmentStatus.BuildSuccess;
     }
   }
