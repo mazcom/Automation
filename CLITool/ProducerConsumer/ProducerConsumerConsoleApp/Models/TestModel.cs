@@ -18,6 +18,8 @@ namespace ProducerConsumerConsoleApp.Models
 
     public override string ToString() => Name;
 
+    public bool IsDone { get; private set; }
+
     public void Run()
     {
       //Console.WriteLine($"Start runnning: {data}");
@@ -26,6 +28,7 @@ namespace ProducerConsumerConsoleApp.Models
       //Console.WriteLine($"Completing runnning: {data}");
 
       //Console.WriteLine($"Runnable with Name {Name} was run");
+      IsDone = true;
     }
   }
 }

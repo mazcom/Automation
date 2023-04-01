@@ -10,5 +10,7 @@ namespace ProducerConsumerConsoleApp.Models
   {
     void Run();
     IEnumerable<IRunnable> Children { get; }
+
+    bool IsDone { get; }
   }
 }

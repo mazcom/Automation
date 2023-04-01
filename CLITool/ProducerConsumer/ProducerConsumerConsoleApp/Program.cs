@@ -37,7 +37,7 @@ var environmets = new List<EnvironmentModel>()
 
 int messageLimit = 1;
 
-var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(messageLimit * 2)
+var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(messageLimit)
 {
   FullMode = BoundedChannelFullMode.Wait
 });
@@ -76,7 +76,7 @@ var translateDocumentTasks = Enumerable
               Console.WriteLine($"Start runnning: {data}");
               data.Run();
               //Random.Shared.Next(1000, 4000)
-              await Task.Delay(3000);
+              await Task.Delay(Random.Shared.Next(1000, 4000));
               Console.WriteLine($"Completing runnning: {data}");
               
               //var document = await ReadAndTranslateDocument(documentId);
@@ -107,6 +107,8 @@ await Task.WhenAll(translateDocumentTasks);
 
 //Task.WaitAll(consumers);
 
+Console.WriteLine();
+Console.WriteLine("ALL done!");
 Console.ReadKey();
 //producer.Wait();
 //Task.WaitAll(consumer);

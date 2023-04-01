@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Collections;
 
 namespace ProducerConsumerConsoleApp.Models
 {
@@ -12,32 +6,59 @@ namespace ProducerConsumerConsoleApp.Models
   {
     private readonly IEnumerable<EnvironmentModel> environments;
 
-    public RunnableQueue(IEnumerable<EnvironmentModel> environments) 
+    public RunnableQueue(IEnumerable<EnvironmentModel> environments)
     {
       this.environments = environments;
     }
 
-    IEnumerator IEnumerable.GetEnumerator()  => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public IEnumerator<IRunnable> GetEnumerator()
     {
-      var queue = new Queue<IRunnable>();
+      var inProcessEnvironmets = new List<IRunnable>();
 
       foreach (var env in environments)
       {
-        queue.Enqueue(env);
+        inProcessEnvironmets.Add(env);
+        yield return env;
 
-        while (queue.Any())
+        if (TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets, out var tasks))
         {
-          yield return queue.Dequeue();
-
-          foreach (var child in env.Tests)
+          foreach (var task in tasks)
           {
-            yield return child;
-            //queue.Enqueue(child);
+            yield return task;
           }
         }
       }
+
+      while (inProcessEnvironmets.Count > 0)
+      {
+        if (TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets, out var tasks))
+        {
+          foreach (var task in tasks)
+          {
+            yield return task;
+          }
+        }
+        else 
+        {
+          Thread.Sleep(100);
+        }
+      }
+    }
+
+    private bool TryGetTestsFromAnyDoneEnvironment(List<IRunnable> inProcessEnvironmets, out IEnumerable<IRunnable> tasks)
+    {
+      tasks = null!;
+
+      if (inProcessEnvironmets.FirstOrDefault(i => i.IsDone) is IRunnable env)
+      {
+        tasks = env.Children;
+        inProcessEnvironmets.Remove(env);
+        return true;
+      }
+
+      return false;
     }
   }
 }

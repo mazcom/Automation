@@ -30,6 +30,10 @@ namespace ProducerConsumerConsoleApp.Models
       get
       {
         // add exception if environment was not run.
+        if (Name.Contains("2"))
+        {
+          return Enumerable.Empty<IRunnable>();
+        }
 
         if (Status == EnvironmentStatus.BuildSuccess)
         {
@@ -40,10 +44,13 @@ namespace ProducerConsumerConsoleApp.Models
       }
     }
 
+    public bool IsDone { get; private set; }
+
     public void Run()
     {
       //Console.WriteLine($"Runnable with Name {Name} was run");
       Status = EnvironmentStatus.BuildSuccess;
+      IsDone = true;
     }
   }
 }
