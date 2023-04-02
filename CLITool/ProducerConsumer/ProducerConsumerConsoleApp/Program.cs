@@ -29,13 +29,8 @@ var environmets = new List<EnvironmentModel>()
       }},
 };
 
-
-//var boundedChannel = Channel.CreateBounded<string>(new BoundedChannelOptions(1)
-//{
-//  FullMode = BoundedChannelFullMode.Wait
-//});
-
-int messageLimit = 1;
+/*
+int messageLimit = 2;
 
 var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(messageLimit)
 {
@@ -47,20 +42,6 @@ var producer = new Producer( channel.Writer, new RunnableQueue(environmets));
 var consumer = new Consumer(channel.Reader);
 
 _ = Task.Factory.StartNew(async () => await producer.ProduceWorkAsync());
-
-//await consumer.ConsumeWorkAsync();
-
-//Console.ReadKey();
-
-
-//Task producer = Task.Factory.StartNew(() =>
-//{
-//  foreach (var runnable in environmets)
-//  {
-//    channel.Writer.TryWrite(runnable);
-//  }
-//  channel.Writer.Complete();
-//});
 
 
 var translateDocumentTasks = Enumerable
@@ -87,6 +68,7 @@ var translateDocumentTasks = Enumerable
         .ToArray();
 
 await Task.WhenAll(translateDocumentTasks);
+*/
 
 //Task[] consumers = new Task[messageLimit];
 //for (int i = 0; i < consumers.Length; i++)
@@ -106,6 +88,10 @@ await Task.WhenAll(translateDocumentTasks);
 //}
 
 //Task.WaitAll(consumers);
+
+var testsRunner = new TestsRunner();
+
+await testsRunner.StartAsync(new RunnableQueue(environmets), CancellationToken.None, 2);
 
 Console.WriteLine();
 Console.WriteLine("ALL done!");

@@ -40,7 +40,7 @@ namespace ProducerConsumerConsoleApp.Models
             yield return task;
           }
         }
-        else 
+        else
         {
           Thread.Sleep(100);
         }
