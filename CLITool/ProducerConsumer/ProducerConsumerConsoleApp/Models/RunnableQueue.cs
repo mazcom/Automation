@@ -22,7 +22,7 @@ namespace ProducerConsumerConsoleApp.Models
         inProcessEnvironmets.Add(env);
         yield return env;
 
-        if (TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets, out var tasks))
+        while (TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets, out var tasks))
         {
           foreach (var task in tasks)
           {

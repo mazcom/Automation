@@ -30,7 +30,7 @@ namespace ProducerConsumerConsoleApp.Models
       });
 
 
-      var translateDocumentTasks = Enumerable
+      var tasks = Enumerable
         .Range(0, parallelDegree)
         .Select(_ => Task.Run(async () =>
         {
@@ -47,7 +47,7 @@ namespace ProducerConsumerConsoleApp.Models
         }))
         .ToArray();
 
-      await Task.WhenAll(translateDocumentTasks);
+      await Task.WhenAll(tasks);
     }
   }
 }
