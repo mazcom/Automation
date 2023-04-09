@@ -90,9 +90,9 @@ await Task.WhenAll(translateDocumentTasks);
 
 //Task.WaitAll(consumers);
 
-var testsRunner = new TestsRunner();
+//var testsRunner = new TestsRunner();
 
-await testsRunner.StartAsync(new RunnableQueue(environmets), CancellationToken.None, messageLimit);
+//await testsRunner.StartAsync(new RunnableQueue(environmets), CancellationToken.None, messageLimit);
 
 Console.WriteLine();
 Console.WriteLine("ALL done!");

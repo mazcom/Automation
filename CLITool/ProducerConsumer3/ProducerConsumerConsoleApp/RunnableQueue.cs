@@ -19,13 +19,13 @@ namespace ProducerConsumerConsoleApp.Models
 
       foreach (var env in environments)
       {
-        foreach (var task in TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets))
-        {
-          yield return task;
-        }
+        //foreach (var task in TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets))
+        //{
+        //  yield return task;
+        //}
 
-        inProcessEnvironmets.Add(env);
-        yield return env;
+        //inProcessEnvironmets.Add(env);
+        //yield return env;
 
         foreach (var task in TryGetTestsFromAnyDoneEnvironment(inProcessEnvironmets))
         {
@@ -44,17 +44,17 @@ namespace ProducerConsumerConsoleApp.Models
 
     private IEnumerable<IRunnable> TryGetTestsFromAnyDoneEnvironment(List<IRunnable> inProcessEnvironmets)
     {
-      var doneEnvironmets = inProcessEnvironmets.Where(i => i.IsDone).ToArray();
+      //var doneEnvironmets = inProcessEnvironmets.Where(i => i.IsDone).ToArray();
 
-      if (doneEnvironmets.Length > 0)
-      {
-        foreach (var env in doneEnvironmets)
-        {
-          inProcessEnvironmets.Remove(env);
-        }
+      //if (doneEnvironmets.Length > 0)
+      //{
+      //  foreach (var env in doneEnvironmets)
+      //  {
+      //    inProcessEnvironmets.Remove(env);
+      //  }
 
-        return doneEnvironmets.SelectMany(e => e.Children);
-      }
+      //  return doneEnvironmets.SelectMany(e => e.Children);
+      //}
 
       return Enumerable.Empty<IRunnable>();
     }

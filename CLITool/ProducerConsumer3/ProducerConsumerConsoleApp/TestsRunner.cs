@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -14,9 +14,6 @@ namespace ProducerConsumerConsoleApp.Models
 
     public async Task StartAsync(RunnableQueue runnables, CancellationToken cancellationToken, int parallelDegree)
     {
-
-      //BackgroundService
-
       var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(parallelDegree)
       {
         FullMode = BoundedChannelFullMode.Wait
@@ -33,24 +30,23 @@ namespace ProducerConsumerConsoleApp.Models
       });
 
 
-      var tasks = Enumerable
-        .Range(0, parallelDegree)
+      var tasks = Enumerable.Range(0, parallelDegree)
         .Select(_ => Task.Run(async () =>
         {
           while (await channel.Reader.WaitToReadAsync())
           {
-            while (channel.Reader.TryRead(out var data))
+            while (channel.Reader.TryRead(out var runnable))
             {
-              Console.WriteLine($"Start runnning: {data}");
-              data.Run();
+              Console.WriteLine($"Start runnning: {runnable}");
+              runnable.Run();
               //channel.Writer.TryWrite(new EnvironmentModel("111"));
-              
+
               await Task.Delay(Random.Shared.Next(1000, 4000));
-              Console.WriteLine($"Completing runnning: {data}");
+              Console.WriteLine($"Completing runnning: {runnable}");
             }
           }
-        }))
-        .ToArray();
+        })).ToImmutableList();
+
 
       await Task.WhenAll(tasks);
     }
