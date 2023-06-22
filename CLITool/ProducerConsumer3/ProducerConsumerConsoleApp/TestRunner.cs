@@ -17,9 +17,9 @@ namespace ProducerConsumerConsoleApp
     private readonly IEnumerable<EnvironmentModel> environments;
     private readonly int maxDegreeOfParallelism;
 
-    private ConcurrentDictionary<IRunnable, IRunnable> inProcessJobs = new();
+    private ConcurrentDictionary<IJob, IJob> inProcessJobs = new();
 
-    private ConcurrentQueue<IRunnable> toRunJobs;
+    private ConcurrentQueue<IJob> toRunJobs;
 
     private IEnumerator<EnvironmentModel> suitesEnumerator;
     private JobsRunner jobsRunner;
@@ -31,32 +31,12 @@ namespace ProducerConsumerConsoleApp
 
       // lazy
       this.suitesEnumerator = environments.GetEnumerator();
-      this.toRunJobs = new ConcurrentQueue<IRunnable>();
+      this.toRunJobs = new ConcurrentQueue<IJob>();
       this.jobsRunner = new JobsRunner(maxDegreeOfParallelism);
     }
 
-
-
     public async Task Run()
     {
-
-
-      //var actions = new List<Action>();
-      //var funcs = new List<Func<TestSuiteRunInfo>>();
-
-      //while (suitesEnumerator.MoveNext())
-      //{
-      //  var testSuite = suitesEnumerator.Current;
-
-      //  //TestSuiteRunInfo result = this.testSuiteManager.Run(testsRunOptions, testSuite, cancellationToken, this.progress);
-      //  //funcs.Add(() => this.testSuiteManager.Run(testsRunOptions, testSuite, cancellationToken, this.progress));
-
-      //  //Action line = () => funcs[0]();
-
-      //  //var s = funcs[0]();
-      //  //actions.Add(() => this.testSuiteManager.Run(testsRunOptions, testSuite, cancellationToken, this.progress));
-      //}
-
       var task = Task.Run(async () =>
       {
         var consumerTask = this.jobsRunner.Start();
@@ -94,20 +74,12 @@ namespace ProducerConsumerConsoleApp
             break;
           }
         }
-
-        //while (suitesEnumerator.MoveNext())
-        //{
-        //  var testSuite = suitesEnumerator.Current;
-        //}
-
-        //var job = await this.jobsProvider.NextAsync();
-        //await channel.Writer.WriteAsync(job);
       });
 
       await task;
     }
 
-    public void Done(IRunnable job)
+    public void Done(IJob job)
     {
       switch (job)
       {

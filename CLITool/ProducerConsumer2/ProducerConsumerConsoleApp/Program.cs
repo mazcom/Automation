@@ -1,10 +1,39 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ProducerConsumerConsoleApp;
 using ProducerConsumerConsoleApp.Models;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Channels;
 
+
+
 Console.WriteLine("Hello, World!");
+
+SortedList<int, string> authorList = new SortedList<int, string>(new DuplicateKeyComparer<int>());
+//SortedList<int, string> authorList = new SortedList<int, string>(new DuplicateKeyComparer<int>());
+authorList.Add(1, "Joydip");
+authorList.Add(3, "Steve");
+authorList.Add(0, "Lui");
+authorList.Add(1, "Joydip2");
+authorList.Add(2, "Michael");
+authorList.Add(1, "Joydip3");
+
+authorList.RemoveAt(0);
+
+//SortedList mySyncdSL = SortedList.Synchronized(authorList);
+
+var aa = authorList.Values[0];
+var cnt = authorList.Count;
+
+foreach (KeyValuePair<int, string> pair in authorList)
+{
+  Console.WriteLine("Key: {0}\tValue: {1}", pair.Key, pair.Value);
+}
+
+
+
+
+Console.ReadKey();
 
 
 var environmets = new List<EnvironmentModel>()

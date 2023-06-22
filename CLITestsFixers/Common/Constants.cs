@@ -8,9 +8,9 @@ namespace Common
 {
   public class Constants
   {
-    public const string AffordableConnectionName = "%sqllast%";
+    // public const string AffordableConnectionName = "%sqllast%";
+    public const string AffordableConnectionName = "%mysqllast%";
     public const string AffordablePGConnectionName = "%pglast%";
-
     public const string EnvironmentsPath = "Environments";
   }
 }

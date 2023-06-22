@@ -2,7 +2,7 @@
 
 namespace ProducerConsumerConsoleApp.Models
 {
-  internal class RunnableQueue : IEnumerable<IRunnable>
+  internal class RunnableQueue : IEnumerable<IJob>
   {
     private readonly IEnumerable<EnvironmentModel> environments;
 
@@ -13,9 +13,9 @@ namespace ProducerConsumerConsoleApp.Models
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public IEnumerator<IRunnable> GetEnumerator()
+    public IEnumerator<IJob> GetEnumerator()
     {
-      var inProcessEnvironmets = new List<IRunnable>();
+      var inProcessEnvironmets = new List<IJob>();
 
       foreach (var env in environments)
       {
@@ -42,7 +42,7 @@ namespace ProducerConsumerConsoleApp.Models
       }
     }
 
-    private IEnumerable<IRunnable> TryGetTestsFromAnyDoneEnvironment(List<IRunnable> inProcessEnvironmets)
+    private IEnumerable<IJob> TryGetTestsFromAnyDoneEnvironment(List<IJob> inProcessEnvironmets)
     {
       //var doneEnvironmets = inProcessEnvironmets.Where(i => i.IsDone).ToArray();
 
@@ -56,7 +56,7 @@ namespace ProducerConsumerConsoleApp.Models
       //  return doneEnvironmets.SelectMany(e => e.Children);
       //}
 
-      return Enumerable.Empty<IRunnable>();
+      return Enumerable.Empty<IJob>();
     }
   }
 }

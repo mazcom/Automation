@@ -26,14 +26,14 @@ namespace ProducerConsumerConsoleApp
     public override string ToString() => Name;
     
 
-    public IEnumerable<IRunnable> Children
+    public IEnumerable<IJob> Children
     {
       get
       {
         // add exception if environment was not run.
         if (Name.Contains("2"))
         {
-          return Enumerable.Empty<IRunnable>();
+          return Enumerable.Empty<IJob>();
         }
 
         if (Status == EnvironmentStatus.BuildSuccess)
@@ -41,7 +41,7 @@ namespace ProducerConsumerConsoleApp
           return Tests;
         }
 
-        return Enumerable.Empty<IRunnable>();
+        return Enumerable.Empty<IJob>();
       }
     }
 

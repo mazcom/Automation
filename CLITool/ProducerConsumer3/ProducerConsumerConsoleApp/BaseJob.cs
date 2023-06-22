@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProducerConsumerConsoleApp
 {
-  internal abstract class BaseJob : IRunnable
+  internal abstract class BaseJob : IJob
   {
     private readonly TestRunner testRunner;
 
@@ -25,7 +25,6 @@ namespace ProducerConsumerConsoleApp
       {
         testRunner.Done(this);
       }
-      //throw new NotImplementedException();
     }
 
     protected abstract void RunInternal();

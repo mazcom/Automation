@@ -14,7 +14,7 @@ namespace ProducerConsumerConsoleApp.Models
 
     public async Task StartAsync(RunnableQueue runnables, CancellationToken cancellationToken, int parallelDegree)
     {
-      var channel = Channel.CreateBounded<IRunnable>(new BoundedChannelOptions(parallelDegree)
+      var channel = Channel.CreateBounded<IJob>(new BoundedChannelOptions(parallelDegree)
       {
         FullMode = BoundedChannelFullMode.Wait
       });
@@ -45,7 +45,7 @@ namespace ProducerConsumerConsoleApp.Models
               Console.WriteLine($"Completing runnning: {runnable}");
             }
           }
-        })).ToImmutableList();
+        })).ToArray();
 
 
       await Task.WhenAll(tasks);

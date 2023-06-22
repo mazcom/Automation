@@ -81,7 +81,7 @@ namespace Common.Model
             {
               addenterpriseSection =
               $@"{{
-""condition"": ""Enterprise, Professional"",
+""condition"": ""Enterprise"",
 ""etalon"": {{
   ""standard_output"": ""{etalonNode!.SelectTokens("standard_output", errorWhenNoMatch: false)!.FirstOrDefault().Value<string>().Replace(@"\", @"\\")}""
 }}
@@ -93,7 +93,7 @@ namespace Common.Model
             {
               addenterpriseSection =
               $@"{{
-""condition"": ""Enterprise, Professional"",
+""condition"": ""Enterprise"",
 ""etalon"": ""{etalonNode!.Value<string>().Replace(@"\", @"\\")}"",
 ""actual"": ""{actualNode!.Value<string>().Replace(@"\", @"\\")}""    
 }}";

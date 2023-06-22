@@ -29,7 +29,7 @@ var environmets = new List<EnvironmentModel>()
       }},
 };
 
-var testRunner = new TestRunner(environmets, 1);
+var testRunner = new TestRunner(environmets, 2);
 await testRunner.Run();
 //testRunner.Run(environmets);
 

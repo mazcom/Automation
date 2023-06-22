@@ -63,7 +63,7 @@ namespace Common
           if (match.Success)
           {
             string oldDbName = match.Value;
-            string newDbName = $"{match}_{guid.ToString().Replace("-", "_")}";
+            string newDbName = $"{match.Value.Replace("autotest_datacompare_db","dc").Replace("datacompare_autotest_db", "dc")}_{guid.ToString().Replace("-", "_")}";
             oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
 
             string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
@@ -88,7 +88,7 @@ namespace Common
               var oldDbNameTuple = oldNewNames.Where(e => e.Item1.Equals(m, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
               if (oldDbNameTuple != null) 
               {
-                string newDbName = oldDbNameTuple.Item2;
+                string newDbName = oldDbNameTuple.Item2.Replace("autotest_datacompare_db", "dc").Replace("datacompare_autotest_db", "dc");
                 fileLines[i] = fileLines[i].Replace(m, newDbName);//Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
                 break;
               } 
@@ -214,7 +214,7 @@ namespace Common
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
-        line = line.Replace(match.Value, Constants.AffordablePGConnectionName.Replace("%", string.Empty));
+        line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty));
       }
 
       return line;

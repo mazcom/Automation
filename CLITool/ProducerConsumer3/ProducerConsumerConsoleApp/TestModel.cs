@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProducerConsumerConsoleApp.Models
 {
-  internal class TestModel : IRunnable
+  internal class TestModel : IJob
   {
     public TestModel(string name)
     {
@@ -14,7 +14,7 @@ namespace ProducerConsumerConsoleApp.Models
     }
     
     public string Name { get; set; }
-    public IEnumerable<IRunnable> Children => Enumerable.Empty<IRunnable>();
+    public IEnumerable<IJob> Children => Enumerable.Empty<IJob>();
 
     public override string ToString() => Name;
 
@@ -22,12 +22,6 @@ namespace ProducerConsumerConsoleApp.Models
 
     public void Run()
     {
-      //Console.WriteLine($"Start runnning: {data}");
-      //Thread.Sleep(3000);
-      ////await Task.Delay(3000);
-      //Console.WriteLine($"Completing runnning: {data}");
-
-      //Console.WriteLine($"Runnable with Name {Name} was run");
       IsDone = true;
     }
   }

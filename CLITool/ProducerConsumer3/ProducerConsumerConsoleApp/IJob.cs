@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace ProducerConsumerConsoleApp
 {
-  internal interface IRunnable
+  internal interface IJob
   {
     void Run();
-    //IEnumerable<IRunnable> Children { get; }
-
-    //bool IsDone { get; }
   }
 }
