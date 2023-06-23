@@ -5,7 +5,7 @@ using EnvironmentTestsFixerMySQL;
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\");
 
- string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
+string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\2012\Columnstore Index\";
 //string pathToTests = Console.ReadLine()!;
 
@@ -21,6 +21,17 @@ if (!PathTraversal.TraverseTreeUp(pathToTests, Constants.EnvironmentsPath, out v
   throw new DirectoryNotFoundException($"The {Constants.EnvironmentsPath} path is not found!");
 }
 
+
+// Prepare environments
+TestsHolder prepareTestsHolder = new(pathToTests);
+EnvironmentsHolder beforePathEnvironmentsHolder = new(prepareTestsHolder.AllTests, environmentsPath: foundEnvironmentsFullPath);
+foreach (var environment in beforePathEnvironmentsHolder.Environments)
+{
+  environment.Prepare();
+}
+beforePathEnvironmentsHolder.SaveChanges();
+
+
 // Create structure of the objects: environments, tests and bind them.
 Console.WriteLine("Collecting the tests...");
 TestsHolder testsHolder = new(pathToTests);
@@ -29,6 +40,8 @@ EnvironmentsHolder environmentsHolder = new(testsHolder.AllTests, environmentsPa
 
 Console.WriteLine($"Found total tests count {testsHolder.AllTests.Count}");
 Console.WriteLine($"Found total environments count {environmentsHolder.Environments.Count}");
+
+
 
 PatchSession patchSession = new();
 // Patch environments and tests.

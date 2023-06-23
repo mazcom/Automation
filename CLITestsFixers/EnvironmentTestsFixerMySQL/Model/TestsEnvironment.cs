@@ -10,6 +10,9 @@ namespace EnvironmentTestsFixerMySQL.Model
     private readonly JObject jsonObject;
     private readonly string environmentFullPath;
 
+    // hack
+    private static HashSet<string> processedCreateFilenames = new();
+
     public TestsEnvironment(JObject jsonObject, string environmentFullPath)
     {
       this.jsonObject = jsonObject;
@@ -129,6 +132,74 @@ namespace EnvironmentTestsFixerMySQL.Model
 
       PatchCleanSection(sqlFileNames);
       return true;
+    }
+
+    // Запускается перед основным патчем. Нужно пройтись по всем энвайронментам и подготовить их к патчам.
+    // данный метод проходит и ищет дублирующиеся файлы создагия баз данных. Их нужно будет клонировать. 
+    public void Prepare()
+    {
+
+      // СОЗДАНИЕ БАЗЫ ДАННЫХ.
+      var createDbCommandLineNodes = jsonObject.SelectTokens("build[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains(".sql", StringComparison.OrdinalIgnoreCase))!.ToArray();
+
+      if (createDbCommandLineNodes == null || createDbCommandLineNodes.Length == 0)
+      {
+        return;
+      }
+
+      List<string> sqlFileNames = new();
+
+      foreach (var createDbCommandLineNode in createDbCommandLineNodes)
+      {
+        var createDbCommandLine = (string)createDbCommandLineNode!;
+
+        var environmentPath = Path.GetDirectoryName(this.environmentFullPath)!;
+        var sqlFileName = RegexHelper.ExtractSqlFileNameFromCommandLine(createDbCommandLine)!;
+
+        if (string.IsNullOrEmpty(sqlFileName))
+        {
+          Console.ForegroundColor = ConsoleColor.Yellow;
+          Console.WriteLine($"Attention! Could not parce a file file name from command {createDbCommandLine}!");
+          Console.ResetColor();
+          continue;
+        }
+
+        var createdatabaseFileFullPath = Path.Combine(environmentPath, sqlFileName);
+
+        if (!File.Exists(createdatabaseFileFullPath))
+        {
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.WriteLine($"The file {createdatabaseFileFullPath} does not exist!");
+          Console.ResetColor();
+
+          continue;
+        }
+
+        if (!processedCreateFilenames.Add(createdatabaseFileFullPath))
+        {
+          string newCreateFileName = IndexedFilename(environmentPath, Path.GetFileNameWithoutExtension(sqlFileName), Path.GetExtension(sqlFileName));
+          var mewCreatedatabaseFileFullPath = Path.Combine(environmentPath, newCreateFileName);
+          File.Copy(createdatabaseFileFullPath, mewCreatedatabaseFileFullPath);
+
+          ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(sqlFileName, newCreateFileName);
+        }
+      }
+    }
+
+    private string IndexedFilename(string path, string fileName, string extension)
+    {
+      int ix = 0;
+      string filename = null;
+      string fullpathFileName = null;
+      do
+      {
+        ix++;
+        filename = String.Format(@"{0}{1}{2}", fileName, ix, extension);
+        fullpathFileName = Path.Combine(path, filename);
+      } while (File.Exists(fullpathFileName));
+
+      return filename;
     }
 
     private void PatchCleanSection(List<string> sqlFileNames)
