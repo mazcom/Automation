@@ -23,6 +23,7 @@ namespace Common
 
     private static readonly Regex rxAnyFileName = new(@"[A-Za-z0-9_\s-\(\)\.]+\.[A-Za-z0-9]+", RegexOptions.IgnoreCase);
     private static readonly Regex rxServerName = new(@"(?<=\/connection:\s*)%[A-Za-z0-9_\:\(\)\*-]+%", RegexOptions.IgnoreCase);
+    private static readonly Regex rxPathName = new(@"(?<=\/path:\s*)[A-Za-z0-9_]+", RegexOptions.IgnoreCase);
 
     public static string? ExtractSqlFileNameFromCommandLine(string fromCommandLine)
     {
@@ -39,6 +40,12 @@ namespace Common
     public static string? ExtractServerName(string fromCommandLine)
     {
       MatchCollection matches = rxServerName.Matches(fromCommandLine);
+      return matches.Count == 0 ? null : matches.First().Value;
+    }
+
+    public static string? ExtractPathName(string fromCommandLine)
+    {
+      MatchCollection matches = rxPathName.Matches(fromCommandLine);
       return matches.Count == 0 ? null : matches.First().Value;
     }
 

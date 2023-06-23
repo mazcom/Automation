@@ -20,6 +20,7 @@ namespace EnvironmentTestsFixer.Model
     {
       // Path a test info.
       PatchDatabaseNames(environment.OldNewDatabaseNames);
+      PatchScriptFolderNames();
       PatchBackupName();
       PatchServerName(environment.OldNewDatabaseNames);
       PatchEnterprise();

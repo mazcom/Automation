@@ -10,6 +10,8 @@ namespace EnvironmentTestsFixerMySQL.Model
     private readonly JObject jsonObject;
     private readonly string environmentFullPath;
 
+    private string CurrentServerName = string.Empty;
+
     // hack
     private static HashSet<string> processedCreateFilenames = new();
 
@@ -123,7 +125,8 @@ namespace EnvironmentTestsFixerMySQL.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
+            CurrentServerName = currentServerName;
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
           }
 
           DBReplacer.TryToReplacePassword(createdatabaseFileFullPath);
@@ -216,7 +219,8 @@ namespace EnvironmentTestsFixerMySQL.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            ((JValue)runCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
+            
+            ((JValue)runCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
           }
         }
 
@@ -256,7 +260,7 @@ $@"[{{
                 ""run"" : {{
                             ""code"" : {{
                                          ""type"" : ""cmd"",
-                                         ""code"" : ""%dbforgesql% /execute /connection:{Constants.AffordableConnectionName} /inputfile:\""{cleanUpFileName}\""""
+                                         ""code"" : ""%MySQL_Studio% /execute /connection:{ConnectionHelper.GetConnectionName(CurrentServerName)} /inputfile:\""{cleanUpFileName}\""""
                             }}  
                 }},
                 ""exit_codes"":[

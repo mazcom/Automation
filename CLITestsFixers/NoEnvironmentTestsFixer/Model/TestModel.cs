@@ -47,7 +47,7 @@ $@"[{{
                 ""run"" : {{
                             ""code"" : {{
                                          ""type"" : ""cmd"",
-                                         ""code"" : ""%dbforgesql% /execute /connection:{Constants.AffordableConnectionName} /inputfile:\""{cleanUpFileName}\""""
+                                         ""code"" : ""%MySQL_Studio% /execute /connection:{Constants.AffordableConnectionName} /inputfile:\""{cleanUpFileName}\""""
                             }}  
                 }},
                 ""exit_codes"":[

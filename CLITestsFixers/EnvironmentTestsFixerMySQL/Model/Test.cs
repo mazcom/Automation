@@ -21,6 +21,7 @@ namespace EnvironmentTestsFixerMySQL.Model
       // Path a test info.
       PatchDatabaseNames(environment.OldNewDatabaseNames);
       PatchBackupName();
+      PatchScriptFolderNames();
       PatchServerName(environment.OldNewDatabaseNames);
       PatchEnterprise();
       PatchTimeout();

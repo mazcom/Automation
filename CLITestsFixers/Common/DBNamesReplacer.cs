@@ -171,7 +171,7 @@ namespace Common
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
-        line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty) + ";");
+        line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(match.Value).Replace("%", string.Empty) + ";");
       }
 
       return line;
@@ -214,7 +214,7 @@ namespace Common
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
-        line = line.Replace(match.Value, Constants.AffordableConnectionName.Replace("%", string.Empty));
+        line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(match.Value).Replace("%", string.Empty));
       }
 
       return line;

@@ -3,9 +3,11 @@ using Common.Model;
 using EnvironmentTestsFixerMySQL;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\");
+Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\MySql\Studio\DataCompare\");
 
 string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CHECK Constraint\";
+
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\2012\Columnstore Index\";
 //string pathToTests = Console.ReadLine()!;
 

@@ -1,10 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Common.Model
 {
   public class BaseTest
   {
+    private static HashSet<string> GlobalScriptFolderNames = new();
 
     public BaseTest(JObject? jsonObject, string testFullPath)
     {
@@ -147,6 +150,123 @@ namespace Common.Model
       }
     }
 
+    protected void PatchScriptFolderNames()
+    {
+      var createFolderNodes = JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!.
+        Where(t => ((string)t!).Contains("/scriptsfolder", StringComparison.OrdinalIgnoreCase))!;
+
+      var patched = false;
+
+      foreach (JValue token in createFolderNodes)
+      {
+        patched = true;
+        var createDbCommandLine = (string)token!;
+
+        string currentPathName = RegexHelper.ExtractPathName(createDbCommandLine)!;
+
+        string newPathName = currentPathName;
+        if (!GlobalScriptFolderNames.Add(currentPathName))
+        {
+          newPathName = IndexedFolderName(currentPathName);
+          GlobalScriptFolderNames.Add(newPathName);
+
+
+          token.Value = createDbCommandLine.Replace(currentPathName, newPathName);
+
+          // Меняем имена файлов в json-тест-объекте.
+          // Create DB
+          var jsonObj = (JValue)JsonObject!.SelectTokens("post_run[*].actions[*].run.code.code", errorWhenNoMatch: false)!
+            .FirstOrDefault(t => ((string)t!).Contains($"{currentPathName}", StringComparison.OrdinalIgnoreCase))!;
+          if (jsonObj != null)
+          {
+            var dbComandLine = jsonObj.Value as string;
+            jsonObj.Value = dbComandLine!.Replace(currentPathName, Path.GetFileName(newPathName));
+          }
+
+          foreach (JValue? runCommandLine in JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!)
+          {
+            var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+
+            foreach (var fileName in fileNames)
+            {
+              var testPath = Path.GetDirectoryName(TestFullPath)!;
+              var fileFullPath = Path.Combine(testPath, fileName);
+
+              if (File.Exists(fileFullPath))
+              {
+                string[]? fileLines = File.ReadAllLines(fileFullPath);
+                for (int i = 0; i < fileLines.Length; i++)
+                {
+                  // меняем в теге: <BackupName>AutotestBackup_universal_source</BackupName>
+                  string pattern = @"(?<=<XmlTagFolderPath>)(.*)(?=\<\/XmlTagFolderPath>)";
+                  var match = Regex.Match(fileLines[i], pattern);
+                  if (match.Success)
+                  {
+                    fileLines[i] = fileLines[i].Replace(currentPathName, newPathName);
+                  }
+
+                }
+                RegexHelper.WriteAllLines(fileFullPath, fileLines);
+              }
+            }
+          }
+        }
+      }
+
+      //if (!patched)
+      //{
+      //  // Меняем имена файлов в json-тест-объекте.
+      //  // Create DB
+
+      //  foreach (JValue? runCommandLine in JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!)
+      //  {
+      //    var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+
+      //    foreach (var fileName in fileNames)
+      //    {
+      //      if (!(fileName.EndsWith(".dcomp") || fileName.EndsWith(".scomp")))
+      //      {
+      //        continue;
+      //      }
+
+      //      var testPath = Path.GetDirectoryName(TestFullPath)!;
+      //      var fileFullPath = Path.Combine(testPath, fileName);
+
+      //      if (File.Exists(fileFullPath))
+      //      {
+      //        string[]? fileLines = File.ReadAllLines(fileFullPath);
+      //        for (int i = 0; i < fileLines.Length; i++)
+      //        {
+      //          // меняем в теге: <BackupName>AutotestBackup_universal_source</BackupName>
+      //          string pattern = @"(?<=<XmlTagFolderPath>)(.*)(?=\<\/XmlTagFolderPath>)";
+      //          var match = Regex.Match(fileLines[i], pattern);
+      //          if (match.Success)
+      //          {
+      //            //fileLines[i] = fileLines[i].Replace(currentPathName, newPathName);
+      //          }
+
+      //        }
+      //        RegexHelper.WriteAllLines(fileFullPath, fileLines);
+      //      }
+      //    }
+      //  }
+      //}
+
+    }
+
+    private string IndexedFolderName(string name)
+    {
+      int ix = 0;
+      string folderName = null;
+      do
+      {
+        ix++;
+        folderName = String.Format(@"{0}{1}", name, ix);
+      } while (GlobalScriptFolderNames.Contains(folderName));
+
+      return folderName;
+    }
+
     protected void PatchTimeout()
     {
       var timeOutNodes = JsonObject!.SelectTokens("..timeout", errorWhenNoMatch: false)!;
@@ -177,7 +297,7 @@ namespace Common.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            createDbCommandLine = createDbCommandLine.Replace(currentServerName, Constants.AffordableConnectionName);
+            createDbCommandLine = createDbCommandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
           }
 
           token.Value = createDbCommandLine;

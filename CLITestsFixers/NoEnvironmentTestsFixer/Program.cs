@@ -5,14 +5,15 @@ using Common.Model;
 using Newtonsoft.Json.Linq;
 using NoEnvironmentTestsFixer;
 using NoEnvironmentTestsFixer.Model;
+using System;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\");
+Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\MySql\Studio\DataCompare\");
 
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\";
-string pathToTests = @"D:\Projects\commandlinetestsMaster2\Tests\PostgreSQL\Studio\Data Compare\AutoMapping\ComparisonKey\";
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
 
-//string pathToTests = Console.ReadLine()!;
+string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {
@@ -80,6 +81,15 @@ foreach (var testFile in files)
     {
       string currentCreateDbShortFileName = createDbFileObj.FileName!;
       string currentCreateDbFileName = createDbFileObj.FullPath!;
+
+      if (!File.Exists(currentCreateDbFileName))
+      {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"The file {currentCreateDbFileName} does not exist");
+        Console.ResetColor();
+        continue;
+      }
+
 
       if (!origFileIndex.ContainsKey(currentCreateDbFileName))
       {
