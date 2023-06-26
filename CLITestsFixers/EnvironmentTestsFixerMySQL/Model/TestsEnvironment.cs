@@ -79,6 +79,29 @@ namespace EnvironmentTestsFixerMySQL.Model
           continue;
         }
 
+        if (createDbCommandLine.Contains("/connection:", StringComparison.OrdinalIgnoreCase))
+        {
+          string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
+          if (currentServerName != null)
+          {
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
+            createDbCommandLine = (string)createDbCommandLineNode!;
+          }
+        }
+
+        if (createDbCommandLine.Contains("/connection:", StringComparison.OrdinalIgnoreCase)
+            && createDbCommandLine.Contains("/inputfile:", StringComparison.OrdinalIgnoreCase) && OldNewDatabaseNames.Count == 2)
+        {
+          if (createDbCommandLine.Contains("source", StringComparison.OrdinalIgnoreCase))
+          {
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine + $" /database:{OldNewDatabaseNames[0].Item2}";
+          }
+          else if (createDbCommandLine.Contains("target", StringComparison.OrdinalIgnoreCase))
+          {
+            ((JValue)createDbCommandLineNode).Value = createDbCommandLine + $" /database:{OldNewDatabaseNames[1].Item2}";
+          }
+        }
+
 
         List<Tuple<string, string>> oldNewNames = new();
 
@@ -219,7 +242,7 @@ namespace EnvironmentTestsFixerMySQL.Model
           string currentServerName = RegexHelper.ExtractServerName(createDbCommandLine)!;
           if (currentServerName != null)
           {
-            
+
             ((JValue)runCommandLineNode).Value = createDbCommandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
           }
         }
@@ -244,8 +267,16 @@ $@"[{{
 
 
 
-      for (int i = 0; i < sqlFileNames.Count; i++)
+      //for (int i = 0; i < sqlFileNames.Count; i++)
+      // берём первый
+      if (sqlFileNames.Count > 1)
       {
+
+      }
+
+      if (sqlFileNames.Count > 0)
+      {
+        int i = 0;
         string createFileName = sqlFileNames[i];
         string cleanUpFileName = createFileName.Insert(createFileName.IndexOf(".sql"), "_CleanUp");
         cleanUpFileNames.Add(cleanUpFileName);
@@ -303,22 +334,24 @@ $@"[{{
           {
             string cleanSql =
 
-  $@"USE [master]
-GO
-DECLARE @db_name NVARCHAR(255);
-SET @db_name = N'{databaseName.Item2}';
-IF EXISTS (SELECT 1 FROM sys.databases d WHERE d.name = @db_name)
-BEGIN
-EXEC msdb.dbo.sp_delete_database_backuphistory @db_name;
-EXEC (N'ALTER DATABASE '+@db_name+N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE');
-EXEC (N'DROP DATABASE '+@db_name);
-END;
-GO
-";
-            if (sb.Length > 0)
-            {
-              sb.AppendLine(Environment.NewLine);
-            }
+$@"DROP DATABASE IF EXISTS {databaseName.Item2}";
+            /*
+              $@"USE [master]
+            GO
+            DECLARE @db_name NVARCHAR(255);
+            DROP DATABASE IF EXISTS '{databaseName.Item2}';
+            IF EXISTS (SELECT 1 FROM sys.databases d WHERE d.name = @db_name)
+            BEGIN
+            EXEC msdb.dbo.sp_delete_database_backuphistory @db_name;
+            EXEC (N'ALTER DATABASE '+@db_name+N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE');
+            EXEC (N'DROP DATABASE '+@db_name);
+            END;
+            GO
+            ";*/
+            //if (sb.Length > 0)
+            //{
+            //  sb.AppendLine(Environment.NewLine);
+            //}
 
             sb.AppendLine(cleanSql);
           }

@@ -6,6 +6,11 @@ Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\MySql\Studio\DataCompare\");
 
 string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CrossTypes\Blob\blob_blob_uncompatible\";
+ 
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CrossTypes\Date\date_datetime_5\";
+
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CHECK Constraint\";
 //string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CHECK Constraint\";
 
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\2012\Columnstore Index\";
