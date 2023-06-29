@@ -12,6 +12,10 @@ Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandli
 
 //string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\Documenter\";
 //string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CommandLine\ComparisonOptions\AutoMapping\IgnoreBlob\";
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
+
+//D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CommandLine\ComparisonOptions\AutoMapping\IgnoreBlob\ 
 
 string pathToTests = Console.ReadLine()!;
 
@@ -60,6 +64,7 @@ foreach (var testFile in files)
       tests.Add(test);
     }
   }
+
 
   //
   // Adjust database names.
@@ -125,6 +130,12 @@ foreach (var testFile in files)
       {
         var dbComandLine = jsonObj.Value as string;
         jsonObj.Value = dbComandLine!.Replace(currentCreateDbShortFileName, Path.GetFileName(newCreateDbFileName));
+
+        string currentServerName = RegexHelper.ExtractServerName(dbComandLine)!;
+        if (currentServerName != null)
+        {
+          jsonObj.Value = dbComandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
+        }
       }
 
       newCreateDbFiles.Add(newCreateDbFileName);
@@ -169,6 +180,12 @@ foreach (var testFile in files)
       {
         var dbComandLine = jsonObj.Value as string;
         jsonObj.Value = dbComandLine!.Replace(currentCleanDbShortFileName, Path.GetFileName(newCleanDbFileName));
+
+        string currentServerName = RegexHelper.ExtractServerName(dbComandLine)!;
+        if (currentServerName != null)
+        {
+          jsonObj.Value = dbComandLine.Replace(currentServerName, ConnectionHelper.GetConnectionName(currentServerName));
+        }
       }
 
       newCleanDbFiles.Add(newCleanDbFileName);
@@ -192,7 +209,7 @@ foreach (var testFile in files)
               DBReplacer.Replace(cf, oldNewValue.Item1, oldNewValue.Item2);
             }
           });
-          
+
         }
         else
         {
@@ -215,3 +232,5 @@ Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine($"Completed!");
 Console.WriteLine($"Total _definition.tests files count = {files.Length}");
 Console.ResetColor();
+
+Console.ReadKey();

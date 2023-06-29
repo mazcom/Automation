@@ -15,6 +15,7 @@ namespace Common
       ,@"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+"
       ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"
       ,@"(?<=\s*WHERE\s*\[name\] =\s*N'+)\w+"
+      ,@"(?<=DROP\s+SCHEMA\s+IF\s+EXISTS\s+)\w+"
       ,@"(?<=DROP\s+DATABASE\s+IF\s+EXISTS\s+)\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
@@ -25,6 +26,8 @@ namespace Common
       , @"(?<=\s*INSERT\s+INTO\s*)\[?\w+\]?"
       , @"(?<=\s*INSERT\s+)\[?\w+\]?"
       , @"(?<=\s*BACKUP\s+DATABASE\s*)\[?\w+\]?"
+      ,@"(?<=CREATE\s+SCHEMA\s+)\w+"
+      ,@"(?<=USE\s+)\w+"
       , @"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
 
     public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Guid preferedGuid = default)

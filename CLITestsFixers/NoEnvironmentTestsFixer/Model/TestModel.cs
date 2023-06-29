@@ -78,8 +78,9 @@ $@"[{{
         foreach (var databaseName in oldNewNames)
         {
           string cleanSql =
+$@"DROP DATABASE IF EXISTS {databaseName.Item2};";
 
-$@"USE [master]
+/*$@"USE [master]
 GO
 DECLARE @db_name NVARCHAR(255);
 SET @db_name = N'{databaseName.Item2}';
@@ -90,11 +91,11 @@ EXEC (N'ALTER DATABASE '+@db_name+N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE');
 EXEC (N'DROP DATABASE '+@db_name);
 END;
 GO
-";
-          if (sb.Length > 0)
+";*/
+          /*if (sb.Length > 0)
           {
             sb.AppendLine(Environment.NewLine);
-          }
+          }*/
 
           sb.AppendLine(cleanSql);
         }
