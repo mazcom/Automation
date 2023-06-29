@@ -267,13 +267,6 @@ $@"[{{
 
 
 
-      //for (int i = 0; i < sqlFileNames.Count; i++)
-      // берём первый
-      if (sqlFileNames.Count > 1)
-      {
-
-      }
-
       if (sqlFileNames.Count > 0)
       {
         int i = 0;
@@ -334,7 +327,7 @@ $@"[{{
           {
             string cleanSql =
 
-$@"DROP DATABASE IF EXISTS {databaseName.Item2}";
+$@"DROP DATABASE IF EXISTS {databaseName.Item2};";
             /*
               $@"USE [master]
             GO

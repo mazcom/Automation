@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
@@ -157,6 +158,8 @@ namespace Common.Model
 
       var patched = false;
 
+      List<string> newFolderNames = new ();
+
       foreach (JValue token in createFolderNodes)
       {
         patched = true;
@@ -180,7 +183,12 @@ namespace Common.Model
           if (jsonObj != null)
           {
             var dbComandLine = jsonObj.Value as string;
-            jsonObj.Value = dbComandLine!.Replace(currentPathName, Path.GetFileName(newPathName));
+            if (dbComandLine!.Contains(currentPathName, StringComparison.OrdinalIgnoreCase) && dbComandLine!.Contains("cmd.exe /C RD", StringComparison.OrdinalIgnoreCase))
+            {
+              jsonObj.Value = $"cmd.exe /C IF EXIST {newPathName} RD /S /Q {newPathName}";//dbComandLine!.Replace(currentPathName, Path.GetFileName(newPathName));
+            }
+
+            newFolderNames.Add(newPathName);
           }
 
           foreach (JValue? runCommandLine in JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!)
@@ -213,46 +221,45 @@ namespace Common.Model
         }
       }
 
-      //if (!patched)
-      //{
-      //  // Меняем имена файлов в json-тест-объекте.
-      //  // Create DB
+      
+      if (newFolderNames.Count > 0)
+      {
+        var preRun = JsonObject!.SelectTokens("pre_run", errorWhenNoMatch: false)!.FirstOrDefault()!;
 
-      //  foreach (JValue? runCommandLine in JsonObject!.SelectTokens("run.test.code.code", errorWhenNoMatch: false)!)
-      //  {
-      //    var fileNames = RegexHelper.ExtractAnyFileNames((string)runCommandLine!);
+        if (preRun != null)
+        {
+          foreach (var folderName in newFolderNames)
+          {
+            AddPreRunRemoveFolder(preRun as JArray, folderName);
+          }
+        }
+      }
+    }
 
-      //    foreach (var fileName in fileNames)
-      //    {
-      //      if (!(fileName.EndsWith(".dcomp") || fileName.EndsWith(".scomp")))
-      //      {
-      //        continue;
-      //      }
+    private void AddPreRunRemoveFolder(JArray prerun, string folderName)
+    {
 
-      //      var testPath = Path.GetDirectoryName(TestFullPath)!;
-      //      var fileFullPath = Path.Combine(testPath, fileName);
+var script =
+          $@"
+{{
+                ""run"" : {{
+                            ""code"" : {{
+                                         ""type"" : ""cmd"",
+                                         ""code"" : ""cmd.exe /C IF EXIST {folderName} RD /S /Q {folderName}""
+                            }}  
+                }},
+                ""exit_codes"":[
+                  0
+                ],
+                ""timeout"" : 120000
+             }}
+          ";
 
-      //      if (File.Exists(fileFullPath))
-      //      {
-      //        string[]? fileLines = File.ReadAllLines(fileFullPath);
-      //        for (int i = 0; i < fileLines.Length; i++)
-      //        {
-      //          // меняем в теге: <BackupName>AutotestBackup_universal_source</BackupName>
-      //          string pattern = @"(?<=<XmlTagFolderPath>)(.*)(?=\<\/XmlTagFolderPath>)";
-      //          var match = Regex.Match(fileLines[i], pattern);
-      //          if (match.Success)
-      //          {
-      //            //fileLines[i] = fileLines[i].Replace(currentPathName, newPathName);
-      //          }
+      prerun.Insert(0, JProperty.Parse(script));
 
-      //        }
-      //        RegexHelper.WriteAllLines(fileFullPath, fileLines);
-      //      }
-      //    }
-      //  }
-      //}
 
     }
+
 
     private string IndexedFolderName(string name)
     {
