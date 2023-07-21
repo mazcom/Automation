@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoEnvironmentTestsFixerPG",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentTestsFixerMySQL", "EnvironmentTestsFixerMySQL\EnvironmentTestsFixerMySQL.csproj", "{9CFCAEFF-7FA2-44C0-BD1C-4F4CD8218E13}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddErrorTestsFixerMySQL", "AddErrorTestsFixerMySQL\AddErrorTestsFixerMySQL.csproj", "{92386D1C-5522-4C3A-84C0-27BB1AEE470A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{9CFCAEFF-7FA2-44C0-BD1C-4F4CD8218E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CFCAEFF-7FA2-44C0-BD1C-4F4CD8218E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CFCAEFF-7FA2-44C0-BD1C-4F4CD8218E13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92386D1C-5522-4C3A-84C0-27BB1AEE470A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92386D1C-5522-4C3A-84C0-27BB1AEE470A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92386D1C-5522-4C3A-84C0-27BB1AEE470A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92386D1C-5522-4C3A-84C0-27BB1AEE470A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
