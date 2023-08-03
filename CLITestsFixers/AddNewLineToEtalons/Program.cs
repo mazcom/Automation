@@ -12,7 +12,7 @@ using System.Text;
 Console.ResetColor();
 Console.WriteLine(@"Issue converter ver 1.0");
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\SqlServer\Studio\");
-string pathToTests = @"D:\Projects\commandlinetests65\Tests\SqlServer\Studio\";
+string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\";
 //string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
@@ -23,8 +23,8 @@ if (!Directory.Exists(pathToTests))
   return;
 }
 
-string[] etalonFiles = Directory.GetFiles(pathToTests,"*etalon.*", SearchOption.AllDirectories)
-  .Where(s => s.EndsWith(".txt") || s.EndsWith(".log") || s.EndsWith(".sql"))
+string[] etalonFiles = Directory.GetFiles(pathToTests,"*etalon*.*", SearchOption.AllDirectories)
+  .Where(s => s.EndsWith(".txt") || s.EndsWith(".log"))
   .ToArray();
 
 Console.WriteLine("Processing...");
