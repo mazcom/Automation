@@ -182,16 +182,11 @@ namespace Common
 
     public static string TryToReplaceServerNameMySQLInConnectionString(string line)
     {
-      if (line.Contains("host"))
-      {
-
-      }
-
       string pattern = @"(?<=(Host)=)[A-Za-z0-9_]+\s{0,};";
       var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
       if (match.Success)
       {
-        line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(match.Value).Replace("%", string.Empty) + ";");
+        line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(line).Replace("%", string.Empty) + ";");
         line = line.Replace("3320", "3306");
         line = line.Replace("3327", "3306");
         line = line.Replace("3310", "3306");

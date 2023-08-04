@@ -10,9 +10,10 @@ using System;
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\");
 
-string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\01_Columns\04_Datatype\TINYINT\Cross\5_7_to_8_0\";
+// string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\01_Columns\04_Datatype\TINYINT\Cross\5_7_to_8_0\";
 //string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\";
-// string pathToTests = Console.ReadLine()!;
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\04_Options\AUTO_INCREMENT\";
+string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {
@@ -193,7 +194,7 @@ foreach (var testFile in files)
       // Меняем имена баз данных в файлах создания баз данных.  
       if (DBReplacer.GenerateNamesAndReplaceInSqlFile(newCreateDbFile, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, test.Id))
       {
-
+        patchSession.PatchedFiles.Add(newCreateDbFile);
         if (newCleanDbFiles.Count > 0)
         {
           newCleanDbFiles.ForEach(cf =>

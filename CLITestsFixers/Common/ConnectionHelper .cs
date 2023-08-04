@@ -17,6 +17,14 @@ namespace Common
        если в наименовании соединения указан порт 3320, то меняем на %mariadblast%
       */
 
+
+      // already patched
+      if (connection.Contains("mariadblast"))
+      {
+        return "%mariadblast%";
+      }
+
+
       if (connection.Contains("3306"))
       {
         return Constants.AffordableConnectionName;
