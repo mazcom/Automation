@@ -170,7 +170,19 @@ namespace Common
 
     public static string TryToReplaceServerNameInConnectionString(string line)
     {
-      string pattern = @"(?<=Data Source=)[A-Za-z0-9_\:\(\)\*-s{0,}\\]+\s{0,};";
+      string pattern = @"(?<=(Data Source)=)[A-Za-z0-9_\:\(\)\*-s{0,}\\]+\s{0,};";
+      var match = Regex.Match(line, pattern);
+      if (match.Success)
+      {
+        line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(match.Value).Replace("%", string.Empty) + ";");
+      }
+
+      return line;
+    }
+
+    public static string TryToReplaceServerNameInConnectionString(string line)
+    {
+      string pattern = @"(?<=(Data Source)=)[A-Za-z0-9_\:\(\)\*-s{0,}\\]+\s{0,};";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
@@ -218,6 +230,9 @@ namespace Common
       if (match.Success)
       {
         line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(match.Value).Replace("%", string.Empty));
+        line = line.Replace("3320", "3306");
+        line = line.Replace("3327", "3306");
+        line = line.Replace("3310", "3306");
       }
 
       return line;

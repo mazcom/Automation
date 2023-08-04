@@ -25,6 +25,10 @@ namespace Common
       {
         return "%mariadblast%";
       }
+      else if (connection.Contains("3310"))
+      {
+        return "%mysql5_7%";
+      }
       else
       {
         return Constants.AffordableConnectionName;
