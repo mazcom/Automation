@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddNewLineToEtalons", "AddN
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentTestsSCFixerMySQL", "EnvironmentTestsSCFixerMySQL\EnvironmentTestsSCFixerMySQL.csproj", "{5BF76809-596D-43A0-9155-536B6998E041}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoEnvironmentTestsFixerSCMySQL", "NoEnvironmentTestsFixerSCMySQL\NoEnvironmentTestsFixerSCMySQL.csproj", "{F7B95565-50C6-4048-B7E1-8A19D900C37D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{5BF76809-596D-43A0-9155-536B6998E041}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BF76809-596D-43A0-9155-536B6998E041}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BF76809-596D-43A0-9155-536B6998E041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
