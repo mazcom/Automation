@@ -5,16 +5,8 @@ using EnvironmentTestsFixerMySQL;
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\MySql\Studio\SchemaComparer\");
 
-string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\";
-//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CrossTypes\Blob\blob_longblob\";
- 
-//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CrossTypes\Date\date_datetime_5\";
-
-//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CHECK Constraint\";
-//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\DataCompare\CHECK Constraint\";
-
-//string pathToTests = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\SchemaComparer\2012\Columnstore Index\";
-//string pathToTests = Console.ReadLine()!;
+// string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\";
+string pathToTests = Console.ReadLine()!;
 
 
 if (!Directory.Exists(pathToTests))
