@@ -27,6 +27,7 @@ namespace Common
       , @"(?<=\s*INSERT\s+)\[?\w+\]?"
       , @"(?<=\s*BACKUP\s+DATABASE\s*)\[?\w+\]?"
       ,@"(?<=CREATE\s+SCHEMA\s+)\w+"
+      ,@"(?<=CREATE\s+DATABASE\s+IF\s+NOT\s+EXISTS\s+)\w+"
       ,@"(?<=USE\s+)\w+"
       , @"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
 
