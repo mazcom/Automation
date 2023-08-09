@@ -29,14 +29,14 @@ namespace Common
       ,@"(?<=CREATE\s+SCHEMA\s+)\w+"
       ,@"(?<=CREATE\s+DATABASE\s+IF\s+NOT\s+EXISTS\s+)\w+"
       ,@"(?<=USE\s+)\w+"
-      , @"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
+      ,@"(?<=CREATE\s+DATABASE\s+)\[?\w+\]?"};
 
     public static bool GenerateNamesAndReplaceInSqlFile(string fullFileName, out List<Tuple<string, string>> oldNewNames, out bool alreadyPatched, Guid preferedGuid = default)
     {
       alreadyPatched = false;
       oldNewNames = new List<Tuple<string, string>>();
       string[]? fileLines;
-      
+
       // Предполагаем, что для всего файла нужно сгенерировать один GUID.
       Guid guid = preferedGuid == Guid.Empty ? Guid.NewGuid() : preferedGuid;
 
@@ -67,7 +67,7 @@ namespace Common
           if (match.Success)
           {
             string oldDbName = match.Value;
-            string newDbName = $"{match.Value.Replace("autotest_datacompare_db","dc").Replace("datacompare_autotest_db", "dc")}_{guid.ToString().Replace("-", "_")}";
+            string newDbName = $"{match.Value.Replace("autotest_datacompare_db", "dc").Replace("datacompare_autotest_db", "dc")}_{guid.ToString().Replace("-", "_")}";
             oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
 
             string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
@@ -90,12 +90,12 @@ namespace Common
             {
               string m = match.Value.Replace("[", string.Empty)!.Replace("]", string.Empty);
               var oldDbNameTuple = oldNewNames.Where(e => e.Item1.Equals(m, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-              if (oldDbNameTuple != null) 
+              if (oldDbNameTuple != null)
               {
                 string newDbName = oldDbNameTuple.Item2.Replace("autotest_datacompare_db", "dc").Replace("datacompare_autotest_db", "dc");
                 fileLines[i] = fileLines[i].Replace(m, newDbName);//Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);
                 break;
-              } 
+              }
             }
           }
         }
@@ -142,6 +142,19 @@ namespace Common
       for (int i = 0; i < fileLines.Length; i++)
       {
         var line = fileLines[i];
+
+        if (line.StartsWith("-- "))
+        {
+          foreach (var oldNewName in oldNewNames)
+          {
+            if (line.Contains(oldNewName.Item1))
+            {
+              fileLines[i] = line.Replace(oldNewName.Item1, oldNewName.Item2);
+              line = fileLines[i];
+              replaced = true;
+            }
+          }
+        }
 
         string[] patterns = CreateDbNamesPatterns.Concat(UseDbNamesPatterns).ToArray();
         foreach (var pattern in patterns)
