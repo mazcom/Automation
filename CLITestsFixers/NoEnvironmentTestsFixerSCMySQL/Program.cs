@@ -13,7 +13,9 @@ Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandli
 // string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\01_Columns\04_Datatype\TINYINT\Cross\5_7_to_8_0\";
 //string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\";
 //string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\04_Options\AUTO_INCREMENT\";
-string pathToTests = Console.ReadLine()!;
+//string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\01_Columns\01_Add\";
+string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\";
+//string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {

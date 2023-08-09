@@ -3,12 +3,12 @@
 using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\SqlServer\Studio\");
-string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\SqlServer\Studio\";
+Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMaster\Tests\PostgreSQL\Studio\");
+string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\PostgreSQL\Studio\";
 //string pathToTests = Console.ReadLine()!;
 
-Console.WriteLine(@"Please, enter a path to the test plans like D:\Projects\commandlinetests\TestPlans\SqlServer\");
-string pathToTestPlans = @"D:\Projects\commandlinetestsMaster\TestPlans\SqlServer\";
+Console.WriteLine(@"Please, enter a path to the test plans like D:\Projects\commandlinetestsMaster\TestPlans\PostgreSQL\");
+string pathToTestPlans = @"D:\Projects\commandlinetestsMaster\TestPlans\PostgreSQL\";
 //string pathToTestPlans = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))

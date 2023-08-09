@@ -26,7 +26,7 @@ HashSet<Guid> allTests = new();
 
 Dictionary<Guid, string> pathsToTheLostTests = new();
 
-string targetCondition = "Enterprise, Professional, Standard, Express, Trial, Trial-Expired";
+string targetCondition = "Enterprise";
 
 // Retrieve all tests id.
 foreach (var testFile in testFiles)

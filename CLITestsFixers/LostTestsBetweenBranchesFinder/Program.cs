@@ -4,13 +4,13 @@ using LostTestsBetweenBranchesFinder;
 using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to the tests(FeatureBranch)  like D:\Projects\commandlinetests1\Tests\SqlServer\Studio\");
-//string pathToTestsFeatureBranch = @"D:\Projects\commandlinetestsMR2\Tests\SqlServer\Studio\";
-string pathToTestsFeatureBranch = Console.ReadLine()!;
+Console.WriteLine(@"Please, enter a path to the tests(FeatureBranch)  like D:\Projects\commandlinetestsMaster\Tests\SqlServer\Studio\");
+string pathToTestsFeatureBranch = @"D:\Projects\commandlinetestsMaster2\Tests\PostgreSQL\Studio\";
+//string pathToTestsFeatureBranch = Console.ReadLine()!;
 
-Console.WriteLine(@"Please, enter a path to the tests(StableBranch)  like D:\Projects\commandlinetests2\Tests\SqlServer\Studio\");
-//string pathToTestsStableBranch = @"D:\Projects\commandlinetestsMR3\Tests\SqlServer\Studio\";
-string pathToTestsStableBranch = Console.ReadLine()!;
+Console.WriteLine(@"Please, enter a path to the tests(StableBranch)  like D:\Projects\commandlinetestsMaster\Tests\SqlServer\Studio\");
+string pathToTestsStableBranch = @"D:\Projects\commandlinetestsMaster\Tests\PostgreSQL\Studio\";
+//string pathToTestsStableBranch = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTestsFeatureBranch))
 {

@@ -186,6 +186,12 @@ namespace Common.Model
             if (dbComandLine!.Contains(currentPathName, StringComparison.OrdinalIgnoreCase) && dbComandLine!.Contains("cmd.exe /C RD", StringComparison.OrdinalIgnoreCase))
             {
               jsonObj.Value = $"cmd.exe /C IF EXIST {newPathName} RD /S /Q {newPathName}";//dbComandLine!.Replace(currentPathName, Path.GetFileName(newPathName));
+
+              foreach (JValue? runCommandLine in JsonObject!.SelectTokens("pre_run[*].run.code.code", errorWhenNoMatch: false)!
+                 .Where(t => ((string)t!).Contains($"{currentPathName}" , StringComparison.OrdinalIgnoreCase)! && ((string)t!).Contains($"/S /Q 2>", StringComparison.OrdinalIgnoreCase))!)
+              {
+                runCommandLine!.Value = $"cmd.exe /C \"RD {newPathName} /S /Q 2> nul & MD {newPathName}\"";
+              }
             }
 
             newFolderNames.Add(newPathName);
