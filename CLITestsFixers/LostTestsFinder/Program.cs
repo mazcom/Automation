@@ -4,11 +4,11 @@ using Newtonsoft.Json.Linq;
 
 Console.ResetColor();
 Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetestsMaster\Tests\PostgreSQL\Studio\");
-string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\PostgreSQL\Studio\";
+string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\";
 //string pathToTests = Console.ReadLine()!;
 
 Console.WriteLine(@"Please, enter a path to the test plans like D:\Projects\commandlinetestsMaster\TestPlans\PostgreSQL\");
-string pathToTestPlans = @"D:\Projects\commandlinetestsMaster\TestPlans\PostgreSQL\";
+string pathToTestPlans = @"D:\Projects\commandlinetestsMaster\TestPlans\MySql\";
 //string pathToTestPlans = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
@@ -127,3 +127,4 @@ Console.WriteLine($"Total tests in the _definition.tests files count = {allTests
 Console.WriteLine($"Total tests in the *.testplan files count = {testsInTestPlans.Count}");
 Console.WriteLine($"Completed!");
 Console.ResetColor();
+Console.ReadKey();
