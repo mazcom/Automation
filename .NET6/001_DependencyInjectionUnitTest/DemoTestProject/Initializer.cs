@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace DemoTestProject
 {
   [TestClass]
-  internal class Initializer
+  public class Initializer
   {
     [AssemblyInitialize]
     public static void Initialize(TestContext testContext)
