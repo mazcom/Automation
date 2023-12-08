@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentTestsSCFixerMySQ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoEnvironmentTestsFixerSCMySQL", "NoEnvironmentTestsFixerSCMySQL\NoEnvironmentTestsFixerSCMySQL.csproj", "{F7B95565-50C6-4048-B7E1-8A19D900C37D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentTestsSCFixerOracle", "EnvironmentTestsSCFixerOracle\EnvironmentTestsSCFixerOracle.csproj", "{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7B95565-50C6-4048-B7E1-8A19D900C37D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

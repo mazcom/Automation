@@ -16,7 +16,8 @@ namespace Common
       ,@"(?<=DECLARE\s+(@db_name|@name_db)\s+NVARCHAR\(max\)\s*=\s*N'+)\w+"
       ,@"(?<=\s*WHERE\s*\[name\] =\s*N'+)\w+"
       ,@"(?<=DROP\s+SCHEMA\s+IF\s+EXISTS\s+)\w+"
-      ,@"(?<=DROP\s+DATABASE\s+IF\s+EXISTS\s+)\w+"};
+      ,@"(?<=DROP\s+DATABASE\s+IF\s+EXISTS\s+)\w+"
+      ,@"(?<=SCHEMA_NAME\s+VARCHAR2\(255\)\s*:=\s*')\w+"};
 
     // Патерны определяют использование имён баз данных в скрипте.
     private static string[] UseDbNamesPatterns = {
@@ -62,7 +63,7 @@ namespace Common
         //string[] patterns = { @"(?<=SET\s+@db_name\s+=\s+N'+)\w+", @"(?<=EXEC\s+\[?master\]?.dbo.sp_create_db\s+N'+)\w+" };
         foreach (var pattern in CreateDbNamesPatterns)
         {
-          var match = Regex.Match(line, pattern);
+          var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
 
           if (match.Success)
           {
@@ -204,6 +205,27 @@ namespace Common
         line = line.Replace("3320", "3306");
         line = line.Replace("3327", "3306");
         line = line.Replace("3310", "3306");
+      }
+
+      return line;
+    }
+
+    public static string TryToReplaceServerNameOracleInConnectionString(string line)
+    {
+      string pattern = @"(?<=(Server)=)[A-Za-z0-9_\-]+\s{0,}";
+      var match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
+      if (match.Success)
+      {
+        //line = line.Replace(match.Value, ConnectionHelper.GetConnectionName(line).Replace("%", string.Empty) + ";");
+        line = line.Replace(match.Value, "oraclelast");
+      }
+
+      pattern = @"(?<=(Service\sName)=)[A-Za-z0-9_\-]+\s{0,}";
+      match = Regex.Match(line, pattern, RegexOptions.IgnoreCase);
+      if (match.Success)
+      {
+        // line = line.Replace("ORCL12R1", "ORACLE21");
+        line = line.Replace(match.Value, "ORACLE21");
       }
 
       return line;

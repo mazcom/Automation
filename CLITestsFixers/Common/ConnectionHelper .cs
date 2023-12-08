@@ -24,7 +24,11 @@ namespace Common
         return "%mariadblast%";
       }
 
-
+      if (connection.Contains("orc") || connection.Contains("oracle"))
+      {
+        return Constants.AffordableOracleConnectionName;
+      }
+      else
       if (connection.Contains("3306"))
       {
         return Constants.AffordableConnectionName;

@@ -447,7 +447,8 @@ var script =
       {
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceServerNameMySQLInConnectionString(fileLines[i]);
-        
+        fileLines[i] = DBReplacer.TryToReplaceServerNameOracleInConnectionString(fileLines[i]);
+
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInDataConnectionSection(fileLines[i]);
       }
@@ -463,6 +464,7 @@ var script =
       {
         fileLines[i] = DBReplacer.TryToReplaceServerNameInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceServerNameMySQLInConnectionString(fileLines[i]);
+        fileLines[i] = DBReplacer.TryToReplaceServerNameOracleInConnectionString(fileLines[i]);
         fileLines[i] = DBReplacer.TryToReplaceDbNameInSchemaSection(fileLines[i], oldNewDbNames);
       }
       RegexHelper.WriteAllLines(fileName, fileLines);
