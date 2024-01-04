@@ -242,7 +242,7 @@ namespace Common
     /// </summary>
     public static string TryToReplaceDbNameInSchemaSection(string line, List<Tuple<string, string>> oldNewDatabaseNames)
     {
-      string pattern = @"(<TargetTableName)|(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<DatabaseName\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
+      string pattern = @"(<Object SourceName)|(<TargetTableName)|(<PropertyValue Name=""TargetTable"")|((?<=\<Schema\>)|(?<=\<DatabaseName\>)|(?<=\<Database\>)|(?<=\<DatabaseObject\>)\w+)";
       var match = Regex.Match(line, pattern);
       if (match.Success)
       {
@@ -251,7 +251,6 @@ namespace Common
           if (line.Contains(pair.Item1))
           {
             line = line.Replace(pair.Item1, pair.Item2);
-            break;
           }
         }
       }

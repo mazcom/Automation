@@ -327,20 +327,51 @@ $@"[{{
           {
             string cleanSql =
 
-$@"DROP DATABASE IF EXISTS {databaseName.Item2};";
+              //$@"DROP DATABASE IF EXISTS {databaseName.Item2};";
+
+              $@"ALTER SESSION SET CURRENT_SCHEMA = SYS;
+/
+
+DECLARE
+  SCHEMA_NAME VARCHAR2(255) := '{databaseName.Item2}';
+  ROW_COUNT   NUMBER;
+BEGIN
+  FOR R IN (SELECT SID,
+                   SERIAL#
+      FROM V$SESSION
+      WHERE UPPER(USERNAME) LIKE UPPER(SCHEMA_NAME) || '%')
+  LOOP
+    EXECUTE IMMEDIATE 'ALTER SYSTEM DISCONNECT SESSION ''' || R.SID || ',' || R.SERIAL# || '''' || ' IMMEDIATE';
+    EXECUTE IMMEDIATE 'ALTER SYSTEM KILL SESSION ''' || R.SID || ',' || R.SERIAL# || '''';
+  END LOOP;
+
+  SELECT COUNT(*)
+    INTO ROW_COUNT
+    FROM DBA_USERS
+    WHERE USERNAME = SCHEMA_NAME;
+  IF ROW_COUNT > 0
+  THEN
+    EXECUTE IMMEDIATE 'DROP USER ' || SCHEMA_NAME || ' CASCADE';
+  END IF;
+END;
+/
+            ";
+
             /*
-              $@"USE [master]
-            GO
-            DECLARE @db_name NVARCHAR(255);
-            DROP DATABASE IF EXISTS '{databaseName.Item2}';
-            IF EXISTS (SELECT 1 FROM sys.databases d WHERE d.name = @db_name)
-            BEGIN
-            EXEC msdb.dbo.sp_delete_database_backuphistory @db_name;
-            EXEC (N'ALTER DATABASE '+@db_name+N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE');
-            EXEC (N'DROP DATABASE '+@db_name);
-            END;
-            GO
-            ";*/
+            $@"USE [master]
+          GO
+          DECLARE @db_name NVARCHAR(255);
+          DROP DATABASE IF EXISTS '{databaseName.Item2}';
+          IF EXISTS (SELECT 1 FROM sys.databases d WHERE d.name = @db_name)
+          BEGIN
+          EXEC msdb.dbo.sp_delete_database_backuphistory @db_name;
+          EXEC (N'ALTER DATABASE '+@db_name+N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE');
+          EXEC (N'DROP DATABASE '+@db_name);
+          END;
+          GO
+          ";
+            */
+
             //if (sb.Length > 0)
             //{
             //  sb.AppendLine(Environment.NewLine);

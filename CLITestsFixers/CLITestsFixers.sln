@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoEnvironmentTestsFixerSCMy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentTestsSCFixerOracle", "EnvironmentTestsSCFixerOracle\EnvironmentTestsSCFixerOracle.csproj", "{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoEnvironmentTestsFixerSCOracle", "NoEnvironmentTestsFixerSCOracle\NoEnvironmentTestsFixerSCOracle.csproj", "{8DF698D9-0C67-46FE-B540-AED4A7012879}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2621FE21-BFEE-4E31-8451-8A4B252D8DFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DF698D9-0C67-46FE-B540-AED4A7012879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DF698D9-0C67-46FE-B540-AED4A7012879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DF698D9-0C67-46FE-B540-AED4A7012879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DF698D9-0C67-46FE-B540-AED4A7012879}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

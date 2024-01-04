@@ -3,12 +3,11 @@ using Common.Model;
 using EnvironmentTestsSCFixerOracle;
 
 Console.ResetColor();
-Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\MySql\Studio\SchemaComparer\");
+Console.WriteLine(@"Please, enter a path to the tests like D:\Projects\commandlinetests\Tests\Oracle\Studio\SchemaComparer\");
 
-string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\Oracle\Studio\SchemaComparer\";
+// string pathToTests = @"D:\9\CLITests2\Tests\";
 // string pathToTests = @"D:\Projects\commandlinetestsMaster\Tests\MySql\Studio\SchemaComparer\01_Tables\01_Columns\01_Add\";
-// string pathToTests = Console.ReadLine()!;
-
+string pathToTests = Console.ReadLine()!;
 
 if (!Directory.Exists(pathToTests))
 {
