@@ -18,7 +18,7 @@ namespace Common
     // /inputfile:Database2014.sql
     // /execute Databases.sql
     // /execute "..\DatabasesOptions2014x.sql"
-    private static readonly Regex rxSqlFileNameInCommandLine = new(@"((..\\)[A-Za-z0-9_\s-\(\)]+\.sql)|(\s[A-Za-z0-9_\s-\(\)]+\.sql\s?)|((?<=\/inputfile:\\?""?)[A-Za-z0-9_\s-\(\)]+\.sql)", RegexOptions.IgnoreCase);
+    private static readonly Regex rxSqlFileNameInCommandLine = new(@"((..\\)[A-Za-z0-9_\s-\(\)]+\.sql)|(\s[A-Za-z0-9_\s-\(\)]+\.sql\s?)|((?<=\/inputfile:\\?""?)[A-Za-z0-9._\s-\(\)]+\.sql)", RegexOptions.IgnoreCase);
 
 
     private static readonly Regex rxAnyFileName = new(@"[A-Za-z0-9_\s-\(\)\.]+\.[A-Za-z0-9]+", RegexOptions.IgnoreCase);
