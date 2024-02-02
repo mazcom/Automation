@@ -25,6 +25,8 @@ namespace Common
       , @"(?<=^(USE|ALTER DATABASE)\s+)\[?\w+\]?"
       , @"(?<=SET\s+IDENTITY_INSERT\s*)\[?\w+\]?"
       , @"(?<=\s*INSERT\s+INTO\s*)\[?\w+\]?"
+      , @"(?<=\s*UPDATE\s*)\w+"
+      , @"(?<=\s*DELETE\s+FROM\s*)\w+"
       , @"(?<=\s*INSERT\s+)\[?\w+\]?"
       , @"(?<=\s*BACKUP\s+DATABASE\s*)\[?\w+\]?"
       ,@"(?<=CREATE\s+SCHEMA\s+)\w+"
@@ -68,7 +70,7 @@ namespace Common
           if (match.Success)
           {
             string oldDbName = match.Value;
-            string newDbName = $"{match.Value.Replace("autotest_datacompare_db", "dc").Replace("datacompare_autotest_db", "dc")}_{guid.ToString().Replace("-", "_")}";
+            string newDbName = $"{match.Value.Replace("autotest_datacompare_db", "dc").Replace("datacompare_autotest_db", "dc")}_{guid.ToString().Replace("-", "_")}".ToUpper();
             oldNewNames.Add(new Tuple<string, string>(oldDbName, newDbName));
 
             string newLine = Regex.Replace(line, pattern, newDbName, RegexOptions.IgnoreCase);

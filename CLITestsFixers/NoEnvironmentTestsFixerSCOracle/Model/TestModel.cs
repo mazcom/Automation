@@ -107,13 +107,12 @@ namespace NoEnvironmentTestsFixerSCOracle.Model
         foreach (var databaseName in oldNewNames)
         {
           string cleanSql =
-//$@"DROP DATABASE IF EXISTS {databaseName.Item2};";
 
-          $@"ALTER SESSION SET CURRENT_SCHEMA = SYS;
+$@"ALTER SESSION SET CURRENT_SCHEMA = SYS;
 /
 
 DECLARE
-  SCHEMA_NAME VARCHAR2(255) := '{databaseName.Item2}';
+  SCHEMA_NAME VARCHAR2(255) := '{databaseName.Item2.ToUpper()}';
   ROW_COUNT   NUMBER;
 BEGIN
   FOR R IN (SELECT SID,
@@ -135,7 +134,7 @@ BEGIN
   END IF;
 END;
 /
-            ";
+";
 
           sb.AppendLine(cleanSql);
         }
