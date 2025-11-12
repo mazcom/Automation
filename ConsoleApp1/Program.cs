@@ -3,11 +3,57 @@ using Microsoft.Extensions.Hosting;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 class Program
 {
   static void Main(string[] args)
   {
+
+    string csvInput = "столбец1,столбец2,столбец3,столбец4,столбец5\nзначение1,значение2,значение3,значение4,значение5\nзначение6,значение7,значение8,значение9,значение10\n";
+    int[] columnsToReplace = { 1, 3 }; // Индексы столбцов, которые нужно заменить на пустые строки
+
+    // Разбиваем входную строку на строки
+    var rows = csvInput.Split('\n');
+
+    StringBuilder result = new StringBuilder();
+
+    for (int i = 0; i < rows.Length; i++)
+    {
+      // Разбиваем каждую строку на значения по запятой
+      var values = rows[i].Split(',');
+
+      // Если это не первая строка, заменяем значения в указанных столбцах на пустые строки
+      if (i != 0)
+      {
+        for (int j = 0; j < values.Length; j++)
+        {
+          if (columnsToReplace.Contains(j))
+          {
+            values[j] = "ignore";
+          }
+        }
+      }
+
+      // Объединяем значения обратно в строку и добавляем к результату
+      if (i < rows.Length - 1)
+      {
+        result.AppendLine(string.Join(",", values));
+      }
+      else
+      {
+        result.Append(string.Join(",", values));
+
+      }
+    }
+
+    var total = result.ToString();
+
+    Console.WriteLine(result.ToString().TrimEnd());
+
+
+
+
     // Create some random data to process in parallel.
     // There is a good probability this data will cause some exceptions to be thrown.
     byte[] data = new byte[1000];

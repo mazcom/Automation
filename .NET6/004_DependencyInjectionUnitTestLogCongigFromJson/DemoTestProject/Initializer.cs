@@ -31,6 +31,8 @@ namespace DemoTestProject
        .AddEnvironmentVariables()
        .Build();
 
+      Type t = typeof(FeaturesManager);
+
       var builder = Host.CreateDefaultBuilder();
       builder
         .ConfigureAppConfiguration((hostingContext, config) =>
@@ -48,6 +50,7 @@ namespace DemoTestProject
         services
         .AddTransient<IFeaturesManager, FeaturesManager>()
         .AddTransient<ICalculationService, CalculationService>()
+        .AddTransient(t)
       );
 
       var logger = new LoggerConfiguration()
